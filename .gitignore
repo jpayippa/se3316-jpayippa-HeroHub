@@ -11,6 +11,13 @@
 # production
 /build
 
+# Ignore the json files
+*.json
+
+# Ignore all files at the top level with ".log" extensions
+*.log
+.vscode/
+
 # misc
 .env
 .DS_Store
