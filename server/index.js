@@ -1,6 +1,7 @@
 // server/index.js
 
 const {
+  getPublishers,
   getAllSuperheroInfoByName,
   getAllSuperheroInfoByPower,
   getAllSuperheroInfoByPublisher,
@@ -86,7 +87,7 @@ app.get("/api", (req, res) => {
   
   app.get('/api/publishers', async (req, res) => {
     try {
-      const publishers = await getAllPublishers();
+      const publishers = await getPublishers();
       res.json(publishers);
     } catch (error) {
       console.error(error);
