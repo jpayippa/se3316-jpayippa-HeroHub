@@ -1,17 +1,13 @@
 import React from 'react';
-import { Box, Text } from '@chakra-ui/react';
-import SearchHero from './components/searchHeros';
-import Login from './components/auth/Login';
-import Register from './components/auth/Register';
+import { ChakraProvider } from '@chakra-ui/react';
+import { RouterProvider } from "react-router-dom";
+import { router } from './router/Approuter';
 
 function App() {
   return (
-    <Box textAlign="center" fontSize="xl">
-      <Register />
-      <Login />
-      <Text>Superhero App!</Text>
-      <SearchHero />
-    </Box>
+    <ChakraProvider>
+      <RouterProvider router={router} />
+    </ChakraProvider>
   );
 }
 

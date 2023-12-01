@@ -1,19 +1,24 @@
 import React, { useState } from 'react';
-import { Box, Input, Button, VStack, Text, HStack, Badge, Link, Select, IconButton, Collapse } from '@chakra-ui/react';
+import { Box, Input, Button, VStack, Text, HStack, Badge, Link, Select, IconButton, Collapse, FormControl, FormLabel, Center } from '@chakra-ui/react';
 
 import { ChevronUpIcon, ChevronDownIcon } from '@chakra-ui/icons';
 
 const SearchResult = ({ hero }) => {
   const [showDetails, setShowDetails] = useState(false);
-  const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(hero.name)}-superhero`;
-  const powersList = Array.isArray(hero.powers) ? hero.powers.map((power, index) => <Badge key={index} colorScheme="blue">{power}</Badge>) : <Text>{hero.powers}</Text>;
+  const searchUrl = `https://duckduckgo.com/?q=${encodeURIComponent(hero.name)}-superhero`;
+  const powersList = Array.isArray(hero.powers) ? 
+    hero.powers.map((power, index) => <Badge key={index} colorScheme="blue">{power}</Badge>) : 
+    <Text>{hero.powers}</Text>;
 
   const handleToggle = () => setShowDetails(!showDetails);
 
   return (
-    <Box border="1px" borderColor="gray.200" p={4} rounded="md" shadow="md">
+    <Box border="1px" borderColor="gray.200" p={4} rounded="md" shadow="md" width="100%">
       <HStack justifyContent="space-between">
-        <Text fontWeight="bold" fontSize="xl">{hero.name}</Text>
+        <VStack align="start">
+          <Text fontWeight="bold" fontSize="xl">{hero.name}</Text>
+          <Text fontSize="md">Publisher: {hero.Publisher}</Text>
+        </VStack>
         <IconButton 
           onClick={handleToggle} 
           icon={showDetails ? <ChevronUpIcon /> : <ChevronDownIcon />} 
@@ -21,14 +26,13 @@ const SearchResult = ({ hero }) => {
           size="sm"
         />
       </HStack>
-      <Collapse in={showDetails}>
+      <Collapse in={showDetails} animateOpacity>
         <VStack mt={4} align="start">
           <Text>Gender: {hero.Gender}</Text>
           <Text>Eye color: {hero['Eye color']}</Text>
           <Text>Race: {hero.Race}</Text>
           <Text>Hair color: {hero['Hair color']}</Text>
           <Text>Height: {hero.Height} cm</Text>
-          <Text>Publisher: {hero.Publisher}</Text>
           <Text>Skin color: {hero['Skin color']}</Text>
           <Text>Alignment: {hero.Alignment}</Text>
           <Text>Weight: {hero.Weight} kg</Text>
@@ -257,26 +261,41 @@ const SearchHero = () => {
   };
 
   return (
-    <Box>
-      <form onSubmit={handleSubmit}>
-        <VStack spacing={4}>
-          <Input placeholder="Name" name="name" value={searchParams.name} onChange={handleChange} />
-          <Select placeholder="Select Power" name="power" value={searchParams.power} onChange={handleChange}>
-            {powerOptions.map((power, index) => (
-              <option key={index} value={power}>{power}</option>
-            ))}
-          </Select>          <Input placeholder="Race" name="race" value={searchParams.race} onChange={handleChange} />
-          <Input placeholder="Publisher" name="publisher" value={searchParams.publisher} onChange={handleChange} />
-          <Button type="submit" colorScheme="blue" isLoading={isSearching}>Search</Button>
-        </VStack>
-      </form>
-      <VStack spacing={4} mt={4}>
-        {searchResults.map(hero => (
-          <SearchResult key={hero.id} hero={hero} />
-        ))}
-      </VStack>
-    </Box>
-  );
+    <Center>
+        <Box w="full" maxW="md" p={4} borderWidth="1px" borderRadius="lg" overflow="hidden">
+            <form onSubmit={handleSubmit}>
+                <VStack spacing={4}>
+                    <FormControl id="name">
+                        <FormLabel>Name</FormLabel>
+                        <Input placeholder="Name" name="name" value={searchParams.name} onChange={handleChange} />
+                    </FormControl>
+                    <FormControl id="power">
+                        <FormLabel>Power</FormLabel>
+                        <Select placeholder="Select Power" name="power" value={searchParams.power} onChange={handleChange}>
+                            {powerOptions.map((power, index) => (
+                                <option key={index} value={power}>{power}</option>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl id="race">
+                        <FormLabel>Race</FormLabel>
+                        <Input placeholder="Race" name="race" value={searchParams.race} onChange={handleChange} />
+                    </FormControl>
+                    <FormControl id="publisher">
+                        <FormLabel>Publisher</FormLabel>
+                        <Input placeholder="Publisher" name="publisher" value={searchParams.publisher} onChange={handleChange} />
+                    </FormControl>
+                    <Button type="submit" colorScheme="blue" isLoading={isSearching}>Search</Button>
+                </VStack>
+            </form>
+            <VStack spacing={4} mt={4}>
+                {searchResults.map(hero => (
+                    <SearchResult key={hero.id} hero={hero} />
+                ))}
+            </VStack>
+        </Box>
+    </Center>
+);
 };
 
 export default SearchHero;
