@@ -3,18 +3,10 @@ const { sanitizeInput, validateId } = require('./sanitization');
 
 // Helper function to get unique powers for a hero
 const getHeroPowers = (heroName, superheroPowers) => {
-    return superheroPowers
-      .filter(powerHero => powerHero.hero_names === heroName)
-      .reduce((acc, power) => {
-        Object.keys(power).forEach(key => {
-          // Convert the power value to lowercase before comparison
-          if (power[key].toLowerCase() === 'true' && !acc.includes(key)) {
-            // Push the original key (with original case) to the array
-            acc.push(key);
-          }
-        });
-        return acc;
-      }, []);
+
+  const heroPowerData = superheroPowers.find(powerHero => powerHero.hero_names === heroName);
+  if (!heroPowerData) return ["No Powers found in our database for this hero"];
+  return Object.keys(heroPowerData).filter(key => heroPowerData[key].toLowerCase() === 'true');
   };
   
 
@@ -51,6 +43,7 @@ const getAllSuperheroInfoByName = async (name) => {
 const getAllSuperheroInfoByPublisher = async (publisher) => {
   const sanitizedInput = sanitizeInput(publisher);
   const superheroInfo = await readSuperheroInfo();
+  
   const superheroPowers = await readSuperheroPowers();
 
   return superheroInfo
@@ -69,26 +62,28 @@ const getAllSuperheroInfoByRace = async (race) => {
 };
 
 const getAllSuperheroInfoByPower = async (power) => {
-    const sanitizedInput = sanitizeInput(power).toLowerCase();
-  
-    const superheroInfo = await readSuperheroInfo();
-    const superheroPowers = await readSuperheroPowers();
-  
-    return superheroInfo
-      .filter(hero => {
-        // Check if this hero has the power, ignoring case
-        const heroPowers = superheroPowers
-          .find(powerHero => powerHero.hero_names === hero.name);
+  const sanitizedInput = sanitizeInput(power).toLowerCase();
 
-        if (!heroPowers) return false;
+  const superheroInfo = await readSuperheroInfo();
+  const superheroPowers = await readSuperheroPowers();
 
-        // Check if the hero has the specified power (ignoring case for power keys)
-        return Object.keys(heroPowers).some(key => 
-          key.toLowerCase() === sanitizedInput && heroPowers[key].toLowerCase() === 'true'
-        );
-      })
-      .map(hero => ({ ...hero, powers: getHeroPowers(hero.name, superheroPowers).join(', ') }));
+  return superheroInfo
+    .filter(hero => {
+      // Check if this hero has the power, ignoring case
+      const heroPowers = superheroPowers
+        .find(powerHero => powerHero.hero_names === hero.name);
+
+      if (!heroPowers) return false;
+
+      // Check if the hero has the specified power (ignoring case for power keys)
+      return Object.keys(heroPowers).some(key => 
+        key.toLowerCase() === sanitizedInput && heroPowers[key].toLowerCase() === 'true'
+      );
+    })
+    .map(hero => ({ ...hero, powers: getHeroPowers(hero.name, superheroPowers).join(', ') }));
 };
+
+
 
   
 

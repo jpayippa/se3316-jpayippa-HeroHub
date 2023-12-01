@@ -1,26 +1,17 @@
-import React from "react";
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { Box, Text } from '@chakra-ui/react';
+import SearchHero from './components/searchHeros';
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
 
 function App() {
-
-  const [data, setData] = React.useState(null);
-
-  React.useEffect(() => {
-    fetch("/api")
-      .then((res) => res.json())
-      .then((data) => setData(data.message));
-  }, []);
-
-  
-
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>{!data ? "Loading..." : data}</p>
-      </header>
-    </div>
+    <Box textAlign="center" fontSize="xl">
+      <Register />
+      <Login />
+      <Text>Superhero App!</Text>
+      <SearchHero />
+    </Box>
   );
 }
 

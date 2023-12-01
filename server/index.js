@@ -70,6 +70,7 @@ app.get("/api", (req, res) => {
         return res.status(400).json({ error: 'No search criteria provided' });
       }
   
+
       const filteredSuperheroesList = filterSuperheroes(filters);
   
       if (filteredSuperheroesList.length === 0) {
@@ -83,7 +84,30 @@ app.get("/api", (req, res) => {
     }
   });
   
+  app.get('/api/publishers', async (req, res) => {
+    try {
+      const publishers = await getAllPublishers();
+      res.json(publishers);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'An error occurred while processing your request' });
+    }
+  });
   
+
+  const users = [];
+
+  app.post('/register', async (req, res) => {
+    try {
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        const user = { username: req.body.username, password: hashedPassword };
+        users.push(user);
+        res.status(201).send('User registered successfully');
+    } catch {
+        res.status(500).send('Error registering user');
+    }
+});
+
 
 
 app.listen(PORT, () => {
