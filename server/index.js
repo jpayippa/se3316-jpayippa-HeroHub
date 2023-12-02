@@ -13,11 +13,13 @@ const { sanitizeInput } = require( './utils/sanitization');
 
 const mongoose = require('mongoose');
 
+require('dotenv').config();
+
 
 const express = require("express");
 const PORT = process.env.PORT || 3001;
 
-mongoose.connect('mongodb+srv://joelps:0HwRPYwB2WUYkp5Q@se3316-jpayippa-lab4.8fqpnsu.mongodb.net/', {
+mongoose.connect(process.env.CONNECTION_STRING, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });

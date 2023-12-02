@@ -15,7 +15,6 @@ const getPublishers = async () => {
   const publishers = [...new Set(superheroInfo.map(sh => sh.Publisher).filter(pub => pub))];
   return publishers;
 };
-
 const getSuperheroesById = async (id) => {
   if (!validateId({ id })) {
     throw new Error('Invalid ID format');
@@ -27,8 +26,11 @@ const getSuperheroesById = async (id) => {
     throw new Error('Superhero not found');
   }
 
-  return superhero;
+  return superhero.name;
 };
+
+
+
 
 const getAllSuperheroInfoByName = async (name) => {
   const sanitizedInput = sanitizeInput(name);
