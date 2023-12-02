@@ -11,11 +11,22 @@ const {
 
 const { sanitizeInput } = require( './utils/sanitization');
 
+const mongoose = require('mongoose');
+
 
 const express = require("express");
 const PORT = process.env.PORT || 3001;
 
+mongoose.connect('mongodb+srv://joelps:0HwRPYwB2WUYkp5Q@se3316-jpayippa-lab4.8fqpnsu.mongodb.net/', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once('open', function() {
+  console.log('Connected to MongoDB');
+});
 
 const app = express();
 
