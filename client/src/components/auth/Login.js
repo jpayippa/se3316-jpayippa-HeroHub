@@ -1,27 +1,28 @@
 import React, { useState } from 'react';
 import { Box, Button, FormControl, FormLabel, Input, VStack, Center, Text } from '@chakra-ui/react';
+import { useLogin } from '../../hooks/auth'; // Adjust the path as necessary
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [localError, setLocalError] = useState(''); // Local error state
+    const { isLoading, error: firebaseError, login } = useLogin();
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         if (!email || !password) {
-            setError('Please enter both email and password.');
+            setLocalError('Please enter both email and password.');
             return;
         }
 
-        // Perform validation and sanitization logic here
-        setError(''); // Clear error message
-        // Proceed with login logic
+        setLocalError(''); // Clear any existing local error
+        await login(email, password);
     };
 
     return (
         <Center py={6}>
             <Box w="full" maxW="md" p={4} borderWidth="1px" borderRadius="lg" overflow="hidden" boxShadow="lg">
                 <VStack spacing={4}>
-                    <FormControl isInvalid={error}>
+                    <FormControl isInvalid={localError || firebaseError}>
                         <FormLabel>Email</FormLabel>
                         <Input
                             type="email"
@@ -29,7 +30,7 @@ const Login = () => {
                             onChange={(e) => setEmail(e.target.value)}
                         />
                     </FormControl>
-                    <FormControl isInvalid={error}>
+                    <FormControl isInvalid={localError || firebaseError}>
                         <FormLabel>Password</FormLabel>
                         <Input
                             type="password"
@@ -37,8 +38,8 @@ const Login = () => {
                             onChange={(e) => setPassword(e.target.value)}
                         />
                     </FormControl>
-                    {error && <Text color="red.500">{error}</Text>}
-                    <Button colorScheme="blue" onClick={handleLogin}>
+                    {(localError || firebaseError) && <Text color="red.500">{localError || firebaseError}</Text>}
+                    <Button colorScheme="blue" onClick={handleLogin} isLoading={isLoading}>
                         Login
                     </Button>
                 </VStack>
