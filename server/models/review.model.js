@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 
 const reviewSchema = new mongoose.Schema({
-  rating: Number,
+  rating: { type: Number, min: 1, max: 5, required: true },
   comment: String,
-  heroListId: { type: mongoose.Schema.Types.ObjectId, ref: 'HeroList' },
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  visible: { type: Boolean, default: true },
+  heroListId: { type: String, required: true},
+  createdBy: { type: String, required: true},
   createdAt: { type: Date, default: Date.now }
 });
 

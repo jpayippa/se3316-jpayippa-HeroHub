@@ -20,7 +20,7 @@ export default function Dashboard() {
         </Center>
         <SearchHero />
         <UserListsView />
-        <PublicListView maxDisplay={5} />
+        <PublicListView maxDisplay={5} authenticated ={true}/>
     </>
   );
 }
