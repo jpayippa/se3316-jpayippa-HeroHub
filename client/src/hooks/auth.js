@@ -3,7 +3,6 @@ import { auth } from '../firebase/firebase-config';
 import { useSignOut } from 'react-firebase-hooks/auth';
 import { useToast } from '@chakra-ui/react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword,} from 'firebase/auth';
-import { DASHBOARD, LOGIN } from '../router/Approuter';
 import { useNavigate } from 'react-router-dom';
 
 // Hook for managing the current user
@@ -25,7 +24,6 @@ export const useAuth = () => {
 // Hook for creating a new user account
 export const useCreateAccount = () => {
     const [isLoading, setLoading] = useState(false);
-    const navigate = useNavigate();
     const toast = useToast();
     const [error, setError] = useState(null);
 
@@ -42,7 +40,6 @@ export const useCreateAccount = () => {
                 duration: 5000,
               });
 
-            navigate(LOGIN);
             
         } catch (error) {
             setError(error.message);
@@ -56,7 +53,6 @@ export const useCreateAccount = () => {
 export const useLogin = () => {
     const [error, setError] = useState(null);
     const [isLoading, setLoading] = useState(false);
-    const navigate = useNavigate();
     
 
     const login = async (email, password) => {
@@ -64,7 +60,6 @@ export const useLogin = () => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
             setLoading(false);
-            navigate(DASHBOARD);
         } catch (error) {
             setError(error.message);
             setLoading(false);

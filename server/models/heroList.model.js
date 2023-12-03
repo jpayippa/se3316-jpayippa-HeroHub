@@ -6,6 +6,10 @@ const heroListSchema = new mongoose.Schema({
   heroes: [Number], // References Hero model
   visibility: { type: String, default: 'private' },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // References User model
+  createdBy: {
+    userId: mongoose.Schema.Types.ObjectId,
+    name: String
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: Date
 });
