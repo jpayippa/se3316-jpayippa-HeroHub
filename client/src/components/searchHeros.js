@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Input, Button, VStack, Text, HStack, Badge, Link, Select, IconButton, Collapse, FormControl, FormLabel, Center } from '@chakra-ui/react';
+import { Box, Input, Button, VStack, Select, FormControl, FormLabel, Center, Heading } from '@chakra-ui/react';
 
-import { ChevronUpIcon, ChevronDownIcon } from '@chakra-ui/icons';
 
 import SearchResult from './SearchResults';
 
@@ -246,7 +245,9 @@ const SearchHero = () => {
 
   return (
     <Center>
-      <Box w="full" maxW="md" p={4} borderWidth="1px" borderRadius="lg" overflow="hidden">
+      <Box w="full" maxW="md" p={4} borderWidth="1px" borderRadius="lg" overflow="hidden" boxShadow="lg">
+      <Heading as="h1" size="lg" mb={4} textAlign="center">Search Hero</Heading>       
+
         <form onSubmit={handleSubmit}>
           <VStack spacing={4}>
             <FormControl id="name">

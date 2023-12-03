@@ -1,25 +1,49 @@
 import React, { useState } from 'react';
 import { Box, Button, FormControl, FormLabel, Input, VStack, Center, Text } from '@chakra-ui/react';
 import { useCreateAccount } from '../../hooks/auth'; // Adjust the path as necessary
+import { useNavigate } from 'react-router-dom'; 
+import { LOGIN } from '../../router/Approuter';
 
 const Register = () => {
     const [name, setName] = useState('');
-    const [email, setEmail] = useState(''); // Define email state
-    const [password, setPassword] = useState(''); // Define password state
-    const { error, createAccount } = useCreateAccount();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const { error: createAccountError, createAccount } = useCreateAccount();
+    const [error, setError] = useState(''); // Define a local error state
+    const navigate = useNavigate(); // Initialize useNavigate
 
     const registerUser = async (event) => {
         event.preventDefault();
-        // Use the createAccount hook here
-        await createAccount(email, password);
-        // Additional logic
-    
 
-        // If there's no error, proceed with additional logic (e.g., updating the user profile)
-        if (!error) {
-            console.log('User registered successfully');
-            // Additional logic here
+        if (!name || !email || !password) {
+            setError('Please fill in all fields');
+            return;
         }
+
+        await createAccount(email, password);
+
+        const username = name;
+
+        
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    console.log('User registered successfully');
+                    navigate(LOGIN); 
+                } else {
+                    setError(data.error || 'Failed to register');
+                }
+            } catch (err) {
+                setError('Failed to register');
+            }
+       
     };
 
     return (

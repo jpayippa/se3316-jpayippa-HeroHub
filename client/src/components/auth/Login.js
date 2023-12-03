@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { Box, Button, FormControl, FormLabel, Input, VStack, Center, Text } from '@chakra-ui/react';
 import { useLogin } from '../../hooks/auth'; // Adjust the path as necessary
+import { DASHBOARD } from '../../router/Approuter';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [localError, setLocalError] = useState(''); // Local error state
+    const [localError, setLocalError] = useState('');
     const { isLoading, error: firebaseError, login } = useLogin();
+    const navigate = useNavigate(); // For navigation
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -14,8 +17,31 @@ const Login = () => {
             return;
         }
 
-        setLocalError(''); // Clear any existing local error
-        await login(email, password);
+        try {
+            setLocalError(''); // Clear any existing local error
+            await login(email, password);
+
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to login');
+            }
+
+            // Store JWT in local storage
+            localStorage.setItem('token', data.token);
+
+            // Redirect to dashboard
+            navigate(DASHBOARD); 
+
+        } catch (err) {
+            setLocalError(err.message);
+        }
     };
 
     return (
