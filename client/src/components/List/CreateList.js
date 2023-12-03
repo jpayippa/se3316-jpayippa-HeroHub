@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   Box, Button, FormControl, FormLabel, Input, Textarea, Stack, useToast, Select, Tag, TagLabel, Heading, TagCloseButton, HStack, Center
 } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 
 const CreateHeroList = () => {
   const [name, setName] = useState('');
@@ -10,6 +11,7 @@ const CreateHeroList = () => {
   const [heroes, setHeroes] = useState([]);
   const [heroInput, setHeroInput] = useState('');
   const toast = useToast();
+  const navigate = useNavigate();
 
   const handleHeroInputChange = (e) => {
     setHeroInput(e.target.value);
@@ -58,6 +60,7 @@ const CreateHeroList = () => {
       setDescription('');
       setVisibility('private');
       setHeroes([]);
+      navigate(0);
 
     } catch (error) {
       toast({

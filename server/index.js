@@ -209,7 +209,8 @@ app.post('/api/hero-lists', authenticateToken, async (req, res) => {
           createdBy: {
             userID,
             name: userName
-        }
+        },
+          updatedAt: new Date()
       });
       await newHeroList.save();
       res.status(201).json(newHeroList);
@@ -220,7 +221,7 @@ app.post('/api/hero-lists', authenticateToken, async (req, res) => {
 
 
 app.get('/api/hero-lists', async (req, res) => {
-  console.log(req.query); 
+  
     try {
         const { visibility, limit } = req.query;
 
@@ -238,7 +239,6 @@ app.get('/api/hero-lists', async (req, res) => {
         }
 
         res.json(heroLists);
-        console.log(heroLists);
     } catch (error) {
         res.status(500).json({ error: 'Error fetching hero lists' });
     }
@@ -247,12 +247,14 @@ app.get('/api/hero-lists', async (req, res) => {
 
 // Endpoint to get user-specific hero lists
 app.get('/api/user-hero-lists', authenticateToken, async (req, res) => {
+  console.log(req.user);
   try {
     // Extract nickname from JWT
     const nickname = req.user.nickname;
 
     // Find all hero lists created by the user
     const heroLists = await HeroList.find({ 'createdBy.name': nickname });
+
 
     // Return the hero lists
     res.json(heroLists);
@@ -264,7 +266,7 @@ app.get('/api/user-hero-lists', authenticateToken, async (req, res) => {
 
 
 
-app.put('/api/hero-lists/:id', async (req, res) => {
+app.put('/api/hero-lists/:id', authenticateToken, async (req, res) => {
   try {
       const { id } = req.params;
       const { name, description, heroes, visibility } = req.body;
@@ -274,6 +276,7 @@ app.put('/api/hero-lists/:id', async (req, res) => {
           description,
           heroes,
           visibility,
+          updatedAt: new Date()
       }, { new: true });
 
       if (!updatedHeroList) {
@@ -287,7 +290,7 @@ app.put('/api/hero-lists/:id', async (req, res) => {
 });
 
 
-app.delete('/api/hero-lists/:id', async (req, res) => {
+app.delete('/api/hero-lists/:id',authenticateToken, async (req, res) => {
   try {
       const { id } = req.params;
 

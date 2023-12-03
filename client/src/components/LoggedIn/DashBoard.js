@@ -3,6 +3,7 @@ import { Center, Box, Text } from "@chakra-ui/react";
 import SearchHero from "../searchHeros";
 import CreateHeroList from "../List/CreateList";
 import PublicListView from "../List/PublicListView";
+import UserListsView from "../List/UserListsView";
 
 
 export default function Dashboard() {
@@ -18,6 +19,7 @@ export default function Dashboard() {
           </Box>
         </Center>
         <SearchHero />
+        <UserListsView />
         <PublicListView maxDisplay={5} />
         <CreateHeroList />
     </>
