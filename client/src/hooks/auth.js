@@ -35,7 +35,7 @@ export const useCreateAccount = () => {
                 duration: 5000,
               });
 
-              createUserInDatabase({firebaseId:user.uid,email, password, username});
+              createUserInDatabase({firebaseId:user.uid,email, username});
                 navigate(LOGIN);
   })
 
@@ -101,6 +101,7 @@ export const useLogout = () => {
         try {
             if (await signOut()) {
                 localStorage.removeItem('token');
+                localStorage.removeItem('user');
                 toast({
                   title: "Successfully logged out",
                   status: "success",

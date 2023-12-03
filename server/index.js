@@ -13,9 +13,9 @@ const {
 const { sanitizeInput } = require('./utils/sanitization');
 const User = require('./models/user.model');
 const HeroList = require('./models/heroList.model');
+const Review = require('./models/review.model');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
 const authenticateToken = require('./utils/verifyJWT');
 
 require('dotenv').config();
@@ -60,8 +60,7 @@ app.get('/', (req, res) => {
 app.post('/api/register', async (req, res) => {
   try {
     // Extract user details from request body
-    const { firebaseId, username, email, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const { firebaseId, username, email} = req.body;
 
    
 
@@ -71,7 +70,6 @@ app.post('/api/register', async (req, res) => {
       firebaseId: firebaseId,
       nickname:username,
       email:email,
-      password: hashedPassword,
       updatedAt: new Date(),
     });
 
@@ -115,7 +113,7 @@ app.post('/api/login', async (req, res) => {
 
     // Generate a JWT token
     const token = jwt.sign(
-      { userId: user._id, email: user.email, nickname: user.nickname},
+      { userId: user._id, email: user.email, nickname: user.nickname, firebaseId: user.firebaseId},
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -316,8 +314,72 @@ app.delete('/api/hero-lists/:id',authenticateToken, async (req, res) => {
   }
 });
 
+// ====================== Reviews Endpoints ====================== //
+
+// POST endpoint to create a review
+app.post('/api/reviews', authenticateToken, async (req, res) => {
+  try {
+      const { rating, comment, heroListId } = req.body;
+      const createdBy = req.user.nickname; // Extract nickname from authenticated user
+
+      const newReview = new Review({
+          rating,
+          comment,
+          heroListId,
+          createdBy
+      });
+
+      await newReview.save();
+      res.status(201).json(newReview);
+  } catch (error) {
+      res.status(500).json({ error: 'Error creating review' });
+  }
+});
 
 
+// GET endpoint to retrieve reviews by heroListId
+app.get('/api/reviews/heroList/:id', async (req, res) => {
+  try {
+      const reviews = await Review.find({ heroListId: req.params.id });
+      res.json(reviews);
+  } catch (error) {
+      res.status(500).json({ error: 'Error fetching reviews' });
+  }
+});
+
+// GET endpoint to retrieve reviews by createdBy
+app.get('/api/reviews/user/:nickname', async (req, res) => {
+  try {
+      const reviews = await Review.find({ createdBy: req.params.nickname });
+      res.json(reviews);
+  } catch (error) {
+      res.status(500).json({ error: 'Error fetching reviews' });
+  }
+});
+
+// PUT endpoint to update review visibility
+app.put('/api/reviews/:id/visibility', authenticateToken, async (req, res) => {
+  try {
+      const review = await Review.findByIdAndUpdate(
+          req.params.id,
+          { $set: { visible: req.body.visible } },
+          { new: true }
+      );
+      res.json(review);
+  } catch (error) {
+      res.status(500).json({ error: 'Error updating review visibility' });
+  }
+});
+
+// DELETE endpoint to delete a review
+app.delete('/api/reviews/:id', authenticateToken, async (req, res) => {
+  try {
+      await Review.findByIdAndDelete(req.params.id);
+      res.status(200).json({ message: 'Review deleted successfully' });
+  } catch (error) {
+      res.status(500).json({ error: 'Error deleting review' });
+  }
+});
 
 
 

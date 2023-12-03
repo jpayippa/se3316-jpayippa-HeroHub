@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 const CreateHeroList = ({ isOpen, onClose }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [visibility, setVisibility] = useState('public');
+  const [visibility, setVisibility] = useState('private');
   const [heroes, setHeroes] = useState([]);
   const [heroInput, setHeroInput] = useState('');
   const toast = useToast();
@@ -108,7 +108,6 @@ const CreateHeroList = ({ isOpen, onClose }) => {
                 <FormControl id="visibility">
                   <FormLabel>Visibility</FormLabel>
                   <Select
-                    placeholder="Select option"
                     onChange={(e) => setVisibility(e.target.value)}
                     value={visibility}
                   >
