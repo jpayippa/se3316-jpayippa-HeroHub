@@ -52,6 +52,11 @@ const PublicListView = ({ maxDisplay }) => {
         }
     };
 
+    const formatDate = (dateString) => {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' }; // Customize as needed
+        return new Intl.DateTimeFormat('en-US', options).format(new Date(dateString));
+      };
+
     if (loading) {
         return (
             <Center>
@@ -75,6 +80,8 @@ const PublicListView = ({ maxDisplay }) => {
                             </Text>
                             <Collapse in={expandedListId === list._id} animateOpacity>
                                 <Text mt={4}>{list.description}</Text>
+                                <Text mt={4}>Create on: {formatDate(list.createdAt)}</Text>
+                                <Text mt={4}>Last updated: {formatDate(list.updatedAt)}</Text>
                                 <VStack mt={4}>
                                     {heroesData[list._id]?.map(heroArray => {
                                         const hero = heroArray[0]; // Assuming each array contains one hero object

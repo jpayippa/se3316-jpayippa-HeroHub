@@ -35,6 +35,7 @@ const SearchResult = ({ hero }) => {
           <Text>Skin color: {hero['Skin color']}</Text>
           <Text>Alignment: {hero.Alignment}</Text>
           <Text>Weight: {hero.Weight} kg</Text>
+          <Text fontWeight="bold">Powers:</Text>
           <HStack spacing={2} wrap="wrap">{powersList}</HStack>
           <Link href={searchUrl} isExternal color="blue.500">Search on DDG</Link>
         </VStack>
