@@ -16,6 +16,7 @@ const HeroList = require('./models/heroList.model');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const authenticateToken = require('./utils/verifyJWT');
 
 require('dotenv').config();
 
@@ -53,6 +54,8 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
   res.send('Hello World!')
 });
+
+
 
 app.post('/api/register', async (req, res) => {
   try {
@@ -123,19 +126,12 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// JWT Verification Middleware
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+// Endpoint to verify token
+app.get('/api/verify-token', authenticateToken, (req, res) => {
+  res.json({ message: 'Token is valid', user: req.user });
+});
 
-  if (!token) return res.sendStatus(401);
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-};
 
 
 

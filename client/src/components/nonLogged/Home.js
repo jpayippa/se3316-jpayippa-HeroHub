@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Text, Center } from '@chakra-ui/react';
 import NavBar from '../NavBar/Navbar';
 import SearchHero from '../searchHeros';
+import PublicListView from '../List/PublicListView';
 
 export default function Home() {
   return (
@@ -16,7 +17,8 @@ export default function Home() {
             </Text>
           </Box>
         </Center>
-        <SearchHero />
+        <SearchHero maxdisplay={10} />
+        <PublicListView />
     </div>
   );
 };

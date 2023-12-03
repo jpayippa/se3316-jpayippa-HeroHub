@@ -19,6 +19,8 @@ const Login = () => {
             return;
         }
 
+        const emailLowerCase = email.toLowerCase();
+
         try {
             setLocalError(''); // Clear any existing local error
 
@@ -27,7 +29,7 @@ const Login = () => {
             const response = await fetch('/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ email: emailLowerCase, password }),
             });
 
             const data = await response.json();
@@ -43,7 +45,7 @@ const Login = () => {
                 return;
             }
 
-            await login(email, password);
+            await login(emailLowerCase, password);
 
             // Handle email verification
             if (!data.user.verified) {
@@ -62,7 +64,7 @@ const Login = () => {
                     const response = await fetch('/api/login', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, password }),
+                        body: JSON.stringify({ email: emailLowerCase, password }),
                     });
                     const data = await response.json();
 
@@ -74,15 +76,11 @@ const Login = () => {
                     navigate('/'); // or any other route you prefer
                     return;
                 }
-            }
+            } else {
+                navigate(DASHBOARD);
+            }   
 
 
-
-
-            // Store JWT in local storage
-
-
-            // Redirect to dashboard
 
 
         } catch (err) {

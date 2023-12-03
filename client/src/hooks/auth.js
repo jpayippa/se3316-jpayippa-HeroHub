@@ -100,6 +100,7 @@ export const useLogout = () => {
         setLoading(true);
         try {
             if (await signOut()) {
+                localStorage.removeItem('token');
                 toast({
                   title: "Successfully logged out",
                   status: "success",

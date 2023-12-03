@@ -15,7 +15,7 @@ const SearchResult = ({ hero }) => {
     <Box border="1px" borderColor="gray.200" p={4} rounded="md" shadow="md" width="100%">
       <HStack justifyContent="space-between">
         <VStack align="start">
-          <Text fontWeight="bold" fontSize="xl">{hero.name}</Text>
+          <Text fontWeight="bold" fontSize="xl">ID:{hero.id}, {hero.name}</Text>
           <Text fontSize="md">Publisher: {hero.Publisher}</Text>
         </VStack>
         <IconButton
@@ -27,6 +27,7 @@ const SearchResult = ({ hero }) => {
       </HStack>
       <Collapse in={showDetails} animateOpacity>
         <VStack mt={4} align="start">
+          
           <Text>Gender: {hero.Gender}</Text>
           <Text>Eye color: {hero['Eye color']}</Text>
           <Text>Race: {hero.Race}</Text>

@@ -24,6 +24,8 @@ const Register = () => {
         return passwordRegex.test(password);
     };
 
+    const emailToLowerCase = email.toLowerCase();
+
     const registerUser = async (event) => {
         event.preventDefault();
 
@@ -48,7 +50,7 @@ const Register = () => {
 
         const username = name;
 
-        await createAccount(email, password, username);
+        await createAccount(emailToLowerCase, password, username);
 
        
 
@@ -70,7 +72,7 @@ const Register = () => {
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                placeholder="Enter your name"
+                                placeholder="Enter your nick name"
                             />
                         </FormControl>
                         {/* Email input */}
@@ -80,6 +82,7 @@ const Register = () => {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                placeholder='Enter your email address'
                             />
                             {emailError && <FormErrorMessage>{emailError}</FormErrorMessage>}
                         </FormControl>
@@ -90,6 +93,7 @@ const Register = () => {
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                placeholder='Enter your password'
                             />
                             {passwordError && <FormErrorMessage>{passwordError}</FormErrorMessage>}
                         </FormControl>
