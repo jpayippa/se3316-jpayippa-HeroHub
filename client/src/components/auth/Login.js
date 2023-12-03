@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Box, Button, FormControl, FormLabel, Input, VStack, Center, Text } from '@chakra-ui/react';
+import { Box, Button, FormControl, FormLabel, Input, VStack, Center, Text, Link } from '@chakra-ui/react';
 import { useLogin } from '../../hooks/auth'; // Adjust the path as necessary
-import { DASHBOARD } from '../../router/Approuter';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { DASHBOARD, REGISTER } from '../../router/Approuter';
+import { useNavigate } from 'react-router-dom';
+import { auth } from '../../firebase/firebase-config';
+
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -19,7 +21,8 @@ const Login = () => {
 
         try {
             setLocalError(''); // Clear any existing local error
-            await login(email, password);
+
+
 
             const response = await fetch('/api/login', {
                 method: 'POST',
@@ -29,23 +32,70 @@ const Login = () => {
 
             const data = await response.json();
 
+            localStorage.setItem('token', data.token);
+
             if (!response.ok) {
                 throw new Error(data.error || 'Failed to login');
             }
 
+            if (data.user.isDisabled) {
+                alert('Your account is disabled. Please contact the site administrator.');
+                return;
+            }
+
+            await login(email, password);
+
+            // Handle email verification
+            if (!data.user.verified) {
+
+                await auth.currentUser.reload();
+                const firebaseUser = auth.currentUser;
+
+                if (firebaseUser.emailVerified) {
+                    // If the email is now verified, update the verification status in your database
+                    await fetch('/api/users/update-verification', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ firebaseId: firebaseUser.uid }),
+                    });
+                    localStorage.removeItem('token');
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password }),
+                    });
+                    const data = await response.json();
+
+
+                    localStorage.setItem('token', data.token);
+                    navigate(DASHBOARD);
+                } else {
+                    alert('Please verify your email before logging in.');
+                    navigate('/'); // or any other route you prefer
+                    return;
+                }
+            }
+
+
+
+
             // Store JWT in local storage
-            localStorage.setItem('token', data.token);
+
 
             // Redirect to dashboard
-            navigate(DASHBOARD); 
+
 
         } catch (err) {
             setLocalError(err.message);
         }
     };
 
+    const goToRegister = () => {
+        navigate(REGISTER);
+    }
+
     return (
-        <Center py={6}>
+        <Center h="100vh">
             <Box w="full" maxW="md" p={4} borderWidth="1px" borderRadius="lg" overflow="hidden" boxShadow="lg">
                 <VStack spacing={4}>
                     <FormControl isInvalid={localError || firebaseError}>
@@ -69,6 +119,12 @@ const Login = () => {
                         Login
                     </Button>
                 </VStack>
+                <Text mt={4} textAlign="center">
+                    Don't have an account?{' '}
+                    <Link color="blue.500" onClick={goToRegister}>
+                        Register
+                    </Link>.
+                </Text>
             </Box>
         </Center>
     );

@@ -2,35 +2,30 @@ import { useState, useEffect } from 'react';
 import { auth } from '../firebase/firebase-config'; 
 import { useSignOut } from 'react-firebase-hooks/auth';
 import { useToast } from '@chakra-ui/react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword,} from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification} from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
+import { LOGIN } from '../router/Approuter';
 
-// Hook for managing the current user
-export const useAuth = () => {
-    const [currentUser, setCurrentUser] = useState();
-
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
-            setCurrentUser(user);
-        });
-
-        // Cleanup subscription on unmount
-        return unsubscribe;
-    }, []);
-
-    return currentUser;
-};
 
 // Hook for creating a new user account
 export const useCreateAccount = () => {
     const [isLoading, setLoading] = useState(false);
     const toast = useToast();
     const [error, setError] = useState(null);
-
-    const createAccount = async (email, password) => {
+    const navigate = useNavigate();
+    const createAccount = async (email, password, username) => {
         setLoading(true);
         try {
-            await createUserWithEmailAndPassword(auth,email, password);
+           await createUserWithEmailAndPassword(auth,email, password)
+                .then((userCredential) => {
+                // User created
+                    const user = userCredential.user;
+                
+                // Send verification email
+                 sendEmailVerification(user)
+                  .then(() => {
+                    console.log("Verification email sent.");
+                  });
             toast({
                 title: "Account created",
                 description: "Please check your email for finishing registration",
@@ -40,6 +35,10 @@ export const useCreateAccount = () => {
                 duration: 5000,
               });
 
+              createUserInDatabase({firebaseId:user.uid,email, password, username});
+                navigate(LOGIN);
+  })
+
             
         } catch (error) {
             setError(error.message);
@@ -48,6 +47,26 @@ export const useCreateAccount = () => {
 
     return { error, createAccount };
 };
+
+const createUserInDatabase = async (userData) => {
+
+
+    try {
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            console.log('User registered successfully');
+        } else {
+        }
+    } catch (err) {
+    }
+}
 
 // Hook for logging in
 export const useLogin = () => {

@@ -57,7 +57,7 @@ app.get('/', (req, res) => {
 app.post('/api/register', async (req, res) => {
   try {
     // Extract user details from request body
-    const { username, email, password } = req.body;
+    const { firebaseId, username, email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
    
@@ -65,7 +65,8 @@ app.post('/api/register', async (req, res) => {
 
     // Create a new user instance
     const newUser = new User({
-      username:username,
+      firebaseId: firebaseId,
+      nickname:username,
       email:email,
       password: hashedPassword,
       updatedAt: new Date(),
@@ -83,6 +84,19 @@ app.post('/api/register', async (req, res) => {
     res.status(500).json({ error: 'Error registering user' });
   }
 });
+
+app.post('/api/users/update-verification', async (req, res) => {
+  console.log(req.body);
+  const { firebaseId } = req.body;
+
+  try {
+      await User.findOneAndUpdate({ firebaseId }, { emailVerified: true });
+      res.send('User verification status updated');
+  } catch (error) {
+      res.status(500).send('Error updating user');
+  }
+});
+
 
 app.post('/api/login', async (req, res) => {
   console.log(req.body);
@@ -103,7 +117,7 @@ app.post('/api/login', async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    res.json({ token, user: { email: user.email, nickname: user.nickname } });
+    res.json({ token, user: { email: user.email, nickname: user.nickname, verified: user.emailVerified, isDisabled: user.isDisabled } });
   } catch (error) {
     res.status(500).json({ error: 'Login error' });
   }

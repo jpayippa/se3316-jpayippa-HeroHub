@@ -9,6 +9,7 @@ const NavBar = ({ loggedin = false }) => {
     const { logout } = useLogout();
     const navigate = useNavigate();
     const handleLogout = async () => {
+        localStorage.removeItem('token');
         await logout();
         navigate(ROOT);
     };
