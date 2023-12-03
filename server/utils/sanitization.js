@@ -1,4 +1,4 @@
-const MAX_INPUT_LENGTH = 100;
+const MAX_INPUT_LENGTH = 200;
 
 const sanitizeInput = (input) => {
     // Ensure the input is a string

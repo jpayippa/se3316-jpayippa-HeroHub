@@ -15,19 +15,20 @@ const getPublishers = async () => {
   const publishers = [...new Set(superheroInfo.map(sh => sh.Publisher).filter(pub => pub))];
   return publishers;
 };
-const getSuperheroesById = async (id) => {
-  if (!validateId({ id })) {
-    throw new Error('Invalid ID format');
-  }
+const getSuperheroInfoById = async (id) => {
   const superheroInfo = await readSuperheroInfo();
-  const superhero = superheroInfo.find(sh => sh.id.toString() === id);
+  const superheroPowers = await readSuperheroPowers();
+
+  const superhero = superheroInfo.find(hero => hero.id.toString() === id.toString());
 
   if (!superhero) {
     throw new Error('Superhero not found');
   }
 
-  return superhero.name;
+  return { ...superhero, powers: getHeroPowers(superhero.name, superheroPowers) };
 };
+
+
 
 
 
@@ -112,7 +113,7 @@ function filterSuperheroes(superheroesArrays) {
 
 module.exports = {
   getPublishers,
-  getSuperheroesById,
+  getSuperheroInfoById,
   getAllSuperheroInfoByName,
   getAllSuperheroInfoByPublisher,
   getAllSuperheroInfoByRace,
