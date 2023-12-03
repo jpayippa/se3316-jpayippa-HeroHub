@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Box, VStack, Text, Spinner, Center, Collapse, Heading, IconButton, Flex, useToast } from '@chakra-ui/react';
+import { Box, VStack, Text, Spinner, Center, Collapse, Heading, IconButton, Flex, useToast, Button, Modal } from '@chakra-ui/react';
 import SearchResult from '../SearchResults';
 import { AiFillDelete, AiFillEdit } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom';
 import EditModal from './EditList';
+import { AddIcon } from '@chakra-ui/icons';
+import CreateHeroList from './CreateList';
+
 
 
 const UserListsView = () => {
@@ -13,8 +16,12 @@ const UserListsView = () => {
     const [heroesData, setHeroesData] = useState({}); // Store fetched hero details
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [currentList, setCurrentList] = useState(null);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+    const openCreateModal = () => setIsCreateModalOpen(true);
+    const closeCreateModal = () => setIsCreateModalOpen(false);
     const toast = useToast();
-    const navigate = useNavigate(); // For navigation
+    const navigate = useNavigate();
 
 
 
@@ -123,7 +130,7 @@ const UserListsView = () => {
     const formatDate = (dateString) => {
         const options = { year: 'numeric', month: 'long', day: 'numeric' }; // Customize as needed
         return new Intl.DateTimeFormat('en-US', options).format(new Date(dateString));
-      };
+    };
 
 
     if (loading) {
@@ -137,9 +144,19 @@ const UserListsView = () => {
             list={currentList}
             onSave={refreshLists}
         />
+            <CreateHeroList // Use the modal component here
+                isOpen={isCreateModalOpen}
+                onClose={closeCreateModal}
+            />
             <Center py={6}>
                 <Box w="full" maxW="md" p={4} borderWidth="1px" borderRadius="lg" overflow="hidden" boxShadow="lg">
-                    <Heading as="h1" size="lg" mb={4} textAlign="center">My Hero Lists</Heading>
+                    <Flex justifyContent="space-between" alignItems="center">
+
+                        <Heading as="h1" size="lg" mb={4} textAlign="center">My Hero Lists</Heading>
+                        <Button leftIcon={<AddIcon />} colorScheme="blue" onClick={openCreateModal}>
+                            Add List
+                        </Button>
+                    </Flex>
                     <VStack spacing={4}>
                         {loading ? (
                             <Center><Spinner /></Center>
@@ -168,7 +185,7 @@ const UserListsView = () => {
                                     <Collapse in={expandedListId === list._id} animateOpacity>
                                         <Text mt={4}>{list.description}</Text>
                                         <Text mt={4}>Create on: {formatDate(list.createdAt)}</Text>
-                                <Text mt={4}>Last updated: {formatDate(list.updatedAt)}</Text>
+                                        <Text mt={4}>Last updated: {formatDate(list.updatedAt)}</Text>
                                         <VStack mt={4}>
                                             {heroesData[list._id]?.map(heroArray => {
                                                 const hero = heroArray[0]; // Assuming each array contains one hero object

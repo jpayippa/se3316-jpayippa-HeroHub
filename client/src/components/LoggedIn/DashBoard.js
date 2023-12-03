@@ -21,7 +21,6 @@ export default function Dashboard() {
         <SearchHero />
         <UserListsView />
         <PublicListView maxDisplay={5} />
-        <CreateHeroList />
     </>
   );
 }
