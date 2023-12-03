@@ -4,7 +4,7 @@ import { ChevronUpIcon, ChevronDownIcon } from '@chakra-ui/icons';
 
 const SearchResult = ({ hero }) => {
   const [showDetails, setShowDetails] = useState(false);
-  const searchUrl = `https://duckduckgo.com/?q=${encodeURIComponent(hero.name)}-superhero`;
+  const searchUrl = `https://duckduckgo.com/?q=${encodeURIComponent(hero.name)}-superhero-${encodeURIComponent(hero.Publisher)}`;
   const powersList = Array.isArray(hero.powers) ?
     hero.powers.map((power, index) => <Badge key={index} colorScheme="blue">{power}</Badge>) :
     <Text>{hero.powers}</Text>;

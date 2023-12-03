@@ -4,14 +4,19 @@ import { useLogin } from '../../hooks/auth'; // Adjust the path as necessary
 import { DASHBOARD, REGISTER } from '../../router/Approuter';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase/firebase-config';
-
+import ForgotPasswordModal from './ForgotPassword';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [localError, setLocalError] = useState('');
     const { isLoading, error: firebaseError, login } = useLogin();
-    const navigate = useNavigate(); // For navigation
+    const navigate = useNavigate(); 
+
+    const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
+
+    const openForgotPasswordModal = () => setIsForgotPasswordModalOpen(true);
+    const closeForgotPasswordModal = () => setIsForgotPasswordModalOpen(false);
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -35,6 +40,7 @@ const Login = () => {
             const data = await response.json();
 
             localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
 
             if (!response.ok) {
                 throw new Error(data.error || 'Failed to login');
@@ -70,6 +76,8 @@ const Login = () => {
 
 
                     localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+
                     navigate(DASHBOARD);
                 } else {
                     alert('Please verify your email before logging in.');
@@ -78,7 +86,7 @@ const Login = () => {
                 }
             } else {
                 navigate(DASHBOARD);
-            }   
+            }
 
 
 
@@ -117,6 +125,15 @@ const Login = () => {
                         Login
                     </Button>
                 </VStack>
+                
+                <Text mt={2} textAlign="center">
+                Forgot your password? 
+                <Link color="blue.500" onClick={openForgotPasswordModal}>
+                    Reset it here
+                </Link>.
+            </Text>
+            <ForgotPasswordModal isOpen={isForgotPasswordModalOpen} onClose={closeForgotPasswordModal} />
+
                 <Text mt={4} textAlign="center">
                     Don't have an account?{' '}
                     <Link color="blue.500" onClick={goToRegister}>
