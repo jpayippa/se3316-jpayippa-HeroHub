@@ -6,7 +6,12 @@ const reviewSchema = new mongoose.Schema({
   visible: { type: Boolean, default: true },
   heroListId: { type: String, required: true},
   createdBy: { type: String, required: true},
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  dmca_status: {
+    type: String,
+    enum: ['Active', 'DMCA_Takedown', 'Disputed'],
+    default: 'Active'
+  }
 });
 
 module.exports = mongoose.model('Review', reviewSchema);

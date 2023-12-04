@@ -28,11 +28,6 @@ const getSuperheroInfoById = async (id) => {
   return { ...superhero, powers: getHeroPowers(superhero.name, superheroPowers) };
 };
 
-
-
-
-
-
 const getAllSuperheroInfoByName = async (name) => {
   const sanitizedInput = sanitizeInput(name);
   const superheroInfo = await readSuperheroInfo();
