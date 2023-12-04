@@ -378,6 +378,30 @@ app.put('/api/hero-lists/:id', authenticateToken, async (req, res) => {
   }
 });
 
+// Endpoint to check if a hero list name already exists for the user
+app.post('/api/user-hero-lists/check-name', authenticateToken, async (req, res) => {
+  try {
+    const userNickname = req.user.nickname;
+    const { name } = req.body;
+
+    console.log('Checking list name:', name, 'for user:', userNickname);
+
+    const existingList = await HeroList.findOne({ name: name, 'createdBy.name': userNickname });
+    console.log('Found existing list:', existingList);
+
+    const exists = !!existingList;
+    console.log('Exists:', exists);
+
+    res.json({ exists: exists });
+  } catch (error) {
+    console.error('Error checking list name:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+
+
 
 app.delete('/api/hero-lists/:id',authenticateToken, async (req, res) => {
   try {

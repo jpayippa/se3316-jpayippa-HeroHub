@@ -43,6 +43,16 @@ const getAllSuperheroInfoByName = async (name) => {
     .map(hero => ({ ...hero, powers: getHeroPowers(hero.name, superheroPowers) }));
 };
 
+const getAllSuperheroInfoByRace = async (race) => {
+  const sanitizedInput = sanitizeInput(race);
+  const superheroInfo = await readSuperheroInfo();
+  const superheroPowers = await readSuperheroPowers();
+
+  return superheroInfo
+    .filter(hero => hero.Race?.toLowerCase().includes(sanitizedInput.toLowerCase()))
+    .map(hero => ({ ...hero, powers: getHeroPowers(hero.name, superheroPowers) }));
+};
+
 const getAllSuperheroInfoByPublisher = async (publisher) => {
   const sanitizedInput = sanitizeInput(publisher);
   const superheroInfo = await readSuperheroInfo();
@@ -51,16 +61,6 @@ const getAllSuperheroInfoByPublisher = async (publisher) => {
 
   return superheroInfo
     .filter(hero => hero.Publisher?.toLowerCase().includes(sanitizedInput.toLowerCase()))
-    .map(hero => ({ ...hero, powers: getHeroPowers(hero.name, superheroPowers) }));
-};
-
-const getAllSuperheroInfoByRace = async (race) => {
-  const sanitizedInput = sanitizeInput(race);
-  const superheroInfo = await readSuperheroInfo();
-  const superheroPowers = await readSuperheroPowers();
-
-  return superheroInfo
-    .filter(hero => hero.Race?.toLowerCase().includes(sanitizedInput.toLowerCase()))
     .map(hero => ({ ...hero, powers: getHeroPowers(hero.name, superheroPowers) }));
 };
 

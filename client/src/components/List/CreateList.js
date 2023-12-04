@@ -31,6 +31,52 @@ const CreateHeroList = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Ensure name, visibility, and heroes are filled in
+  if (!name.trim() || !visibility.trim() || (heroes.length === 0)) {
+    toast({
+      title: 'Missing information',
+      description: "Please fill in all required fields.",
+      status: 'error',
+      duration: 5000,
+      isClosable: true,
+    });
+    return;
+  }
+
+  // Validate hero IDs
+  if (heroes.some(heroId => isNaN(heroId) || heroId < 0 || heroId > 733)) {
+    toast({
+      title: 'Invalid Hero ID',
+      description: "Hero IDs must be between 0 and 733.",
+      status: 'error',
+      duration: 5000,
+      isClosable: true,
+    });
+    return;
+  }
+
+  const token = localStorage.getItem('token');
+  // Check for duplicate list name
+  const nameExistsResponse = await fetch('/api/user-hero-lists/check-name', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ name })
+  });
+
+  const nameExistsData = await nameExistsResponse.json();
+if (nameExistsData.exists) {  // Change this line
+    toast({
+      title: 'Name already exists',
+      description: "You already have a list with this name.",
+      status: 'error',
+      duration: 5000,
+      isClosable: true,
+    });
+    return;
+}
 
     try {
       const token = localStorage.getItem('token');
