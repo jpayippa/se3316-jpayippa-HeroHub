@@ -1,12 +1,27 @@
 import React, { useState } from 'react';
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button, FormControl, FormLabel, Input, Textarea, useToast } from '@chakra-ui/react';
+import { 
+  Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, 
+  ModalBody, ModalFooter, Button, FormControl, FormLabel, Input, 
+  Textarea, useToast, HStack, Text 
+} from '@chakra-ui/react';
 
 const AddReviewModal = ({ isOpen, onClose, listId }) => {
     const [rating, setRating] = useState('');
     const [comment, setComment] = useState('');
+    const [ratingError, setRatingError] = useState('');
     const toast = useToast();
 
+    const validateRating = (rating) => {
+        const ratingValue = parseFloat(rating);
+        return !isNaN(ratingValue) && ratingValue >= 0 && ratingValue <= 5 && /^\d(\.\d)?$/.test(rating);
+    };
+
     const handleSubmit = async () => {
+        if (!validateRating(rating)) {
+            setRatingError('Rating must be a number between 0 to 5 with at most one decimal place.');
+            return;
+        }
+
         try {
             const token = localStorage.getItem('token');
             const response = await fetch('/api/reviews', {
@@ -17,7 +32,7 @@ const AddReviewModal = ({ isOpen, onClose, listId }) => {
                  },
                 body: JSON.stringify({ rating, comment, heroListId: listId }),
             });
-            
+
             if (!response.ok) {
                 throw new Error('Failed to submit review');
             }
@@ -39,6 +54,9 @@ const AddReviewModal = ({ isOpen, onClose, listId }) => {
                 isClosable: true,
             });
         }
+        setRating('');
+        setComment('');
+        setRatingError('');
     };
 
     return (
@@ -48,9 +66,16 @@ const AddReviewModal = ({ isOpen, onClose, listId }) => {
                 <ModalHeader>Add a Review</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <FormControl id="rating" isRequired>
+                    <FormControl id="rating" isRequired isInvalid={!!ratingError}>
                         <FormLabel>Rating</FormLabel>
-                        <Input type="number" value={rating} onChange={(e) => setRating(e.target.value)} />
+                        <HStack>
+                            <Input type="number" step="0.1" min="0" max="5" value={rating} onChange={(e) => {
+                                setRatingError('');
+                                setRating(e.target.value);
+                            }} />
+                            <Text>/5</Text>
+                        </HStack>
+                        {ratingError && <Text color="red.500">{ratingError}</Text>}
                     </FormControl>
                     <FormControl id="comment" mt={4}>
                         <FormLabel>Comment</FormLabel>

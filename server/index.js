@@ -118,7 +118,7 @@ app.post('/api/login', async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    res.json({ token, user: { email: user.email, nickname: user.nickname, verified: user.emailVerified, isDisabled: user.isDisabled } });
+    res.json({ token, user: { email: user.email, nickname: user.nickname, verified: user.emailVerified, isDisabled: user.isDisabled, role: user.role} });
   } catch (error) {
     res.status(500).json({ error: 'Login error' });
   }
@@ -360,14 +360,27 @@ app.get('/api/reviews/user/:nickname', async (req, res) => {
 // PUT endpoint to update review visibility
 app.put('/api/reviews/:id/visibility', authenticateToken, async (req, res) => {
   try {
-      const review = await Review.findByIdAndUpdate(
-          req.params.id,
-          { $set: { visible: req.body.visible } },
-          { new: true }
-      );
-      res.json(review);
+    const reviewId = req.params.id;
+    const { visible } = req.body;
+
+    // Ensure 'visible' is a boolean
+    if (typeof visible !== 'boolean') {
+      return res.status(400).json({ error: 'Invalid visibility value' });
+    }
+
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({ error: 'Review not found' });
+    }
+
+    // Update the 'visible' field of the review
+    review.visible = visible;
+    await review.save();
+
+    res.json({ message: 'Review visibility updated', review });
   } catch (error) {
-      res.status(500).json({ error: 'Error updating review visibility' });
+    console.error(error);
+    res.status(500).json({ error: 'Error updating review visibility' });
   }
 });
 

@@ -102,6 +102,8 @@ export const useLogout = () => {
             if (await signOut()) {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
+                localStorage.removeItem('role');
+                localStorage.removeItem('email');
                 toast({
                   title: "Successfully logged out",
                   status: "success",

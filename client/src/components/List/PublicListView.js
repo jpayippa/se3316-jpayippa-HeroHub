@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Box, VStack, Text, Spinner, Center, Collapse, Heading, Button } from '@chakra-ui/react';
 import SearchResult from '../SearchResults';
 import ReviewModal from './reviews/ViewReviews';
-import AddReviewModal from './reviews/AddReviews.js';
+import AddReviewModal from './reviews/AddReviews';
+import { AiOutlineEye, AiOutlinePlus } from 'react-icons/ai';
 
 
-const PublicListView = ({ maxDisplay, authenticated = false }) => {
+const PublicListView = ({ maxDisplay, authenticated = false, admin = false }) => {
     const [heroLists, setHeroLists] = useState([]);
     const [loading, setLoading] = useState(true);
     const [expandedListId, setExpandedListId] = useState(null);
@@ -107,20 +108,35 @@ const PublicListView = ({ maxDisplay, authenticated = false }) => {
                                     <Text mt={4}>{list.description}</Text>
                                     <Text mt={4}>Create on: {formatDate(list.createdAt)}</Text>
                                     <Text mt={4}>Last updated: {formatDate(list.updatedAt)}</Text>
+                                    {authenticated && (
+                                        <>
+                                            <Button
+                                                onClick={() => openReviewModal(list._id)}
+                                                colorScheme="blue"
+                                                mr={2} // Margin right for spacing between buttons
+                                                leftIcon={<AiOutlineEye />} // Optional: Add an eye icon for "View Reviews"
+                                            >
+                                                View Reviews
+                                            </Button>
+                                            <Button
+                                                onClick={() => openAddReviewModal(list._id)}
+                                                colorScheme="green"
+                                                leftIcon={<AiOutlinePlus />} // Optional: Add a plus icon for "Add Review"
+                                            >
+                                                Add Review
+                                            </Button>
+                                        </>
+                                    )}
+
                                     <VStack mt={4}>
                                         {heroesData[list._id]?.map(heroArray => {
                                             const hero = heroArray[0]; // Assuming each array contains one hero object
                                             return <SearchResult key={hero.id} hero={hero} />;
                                         })}
                                     </VStack>
-                                    {authenticated && (
-                                        <>
-                                            <Button onClick={() => openReviewModal(list._id)}>View Reviews</Button>
-                                            <Button onClick={() => openAddReviewModal(list._id)}>Add Review</Button>
-                                        </>
-                                    )}
+
                                 </Collapse>
-                                <ReviewModal isOpen={isReviewModalOpen} onClose={closeReviewModal} listId={selectedListId} />
+                                <ReviewModal isOpen={isReviewModalOpen} onClose={closeReviewModal} listId={selectedListId} admin={admin} />
                                 <AddReviewModal isOpen={isAddReviewModalOpen} onClose={closeAddReviewModal} listId={selectedListId} />
                             </Box>
                         ))

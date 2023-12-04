@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Button, FormControl, FormLabel, Input, VStack, Center, Text, Link } from '@chakra-ui/react';
 import { useLogin } from '../../hooks/auth'; // Adjust the path as necessary
-import { DASHBOARD, REGISTER } from '../../router/Approuter';
+import { ADMINVIEW, DASHBOARD, REGISTER } from '../../router/Approuter';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase/firebase-config';
 import ForgotPasswordModal from './ForgotPassword';
@@ -41,6 +41,8 @@ const Login = () => {
 
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('role', data.user.role);
+            localStorage.setItem('email', data.user.email);
 
             if (!response.ok) {
                 throw new Error(data.error || 'Failed to login');
@@ -67,6 +69,9 @@ const Login = () => {
                         body: JSON.stringify({ firebaseId: firebaseUser.uid }),
                     });
                     localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('role');
+                    localStorage.removeItem('email');
                     const response = await fetch('/api/login', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -77,8 +82,16 @@ const Login = () => {
 
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
+                    localStorage.setItem('role', data.user.role);
+                    localStorage.setItem('email', data.user.email);
+                    
 
-                    navigate(DASHBOARD);
+                    if (data.user.role === 'admin' || data.user.email === 'joelps2002@gmail.com') {
+                        
+                        navigate(ADMINVIEW);
+                    }else if (data.user.role === 'user') {
+                        navigate(DASHBOARD);
+                    }
                 } else {
                     alert('Please verify your email before logging in.');
                     navigate('/'); // or any other route you prefer

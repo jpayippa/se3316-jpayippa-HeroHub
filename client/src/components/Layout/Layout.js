@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import NavBar from '../NavBar/Navbar';
-import { LOGIN } from '../../router/Approuter';
+import { ADMINVIEW, LOGIN } from '../../router/Approuter';
 
 export default function Layout() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -24,6 +24,9 @@ export default function Layout() {
 
                 if (response.ok) {
                     setIsAuthenticated(true);
+                    if(localStorage.getItem('role') === 'admin') {
+                        navigate(ADMINVIEW);
+                    }
                 } else {
                     navigate(LOGIN);
                 }

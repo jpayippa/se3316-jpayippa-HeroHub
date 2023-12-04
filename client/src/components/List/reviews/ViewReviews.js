@@ -9,13 +9,16 @@ import {
     Box,
     Text,
     VStack,
-    Collapse
+    Collapse,
+    Switch,
+    useToast
 } from '@chakra-ui/react';
 
 const ReviewModal = ({ isOpen, onClose, listId, admin = false }) => {
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(false);
     const [expandedReviewId, setExpandedReviewId] = useState(null);
+    const toast = useToast();
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -45,6 +48,41 @@ const ReviewModal = ({ isOpen, onClose, listId, admin = false }) => {
         setExpandedReviewId(prevId => (prevId === id ? null : id));
     };
 
+    const handleVisibilityChange = async (reviewId, visible) => {
+        try {
+            const token = await localStorage.getItem('token');
+            const response = await fetch(`/api/reviews/${reviewId}/visibility`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                 },
+                body: JSON.stringify({ visible })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update visibility');
+            }
+
+            // Update local state to reflect the change
+            setReviews(reviews.map(review => review._id === reviewId ? { ...review, visible } : review));
+            toast({
+                title: 'Visibility Updated',
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+            });
+        } catch (error) {
+            toast({
+                title: 'Error',
+                description: 'Failed to update visibility.',
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+            });
+        }
+    };
+
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
@@ -58,6 +96,16 @@ const ReviewModal = ({ isOpen, onClose, listId, admin = false }) => {
                         <VStack spacing={4}>
                             {reviews.map((review) => (
                                 <Box key={review._id} p={4} borderWidth="1px" borderRadius="lg">
+                                    {admin && (<>
+                                        <text>Visible: </text>
+                                        <Switch
+                                            isChecked={review.visible}
+                                            onChange={() => handleVisibilityChange(review._id, !review.visible)}
+                                            colorScheme="green"
+                                            mb={2}
+                                        />
+                                        </>
+                                    )}
                                     <Text fontWeight="bold" onClick={() => toggleReview(review._id)} cursor="pointer">
                                         {`Rating: ${review.rating}/5 - ${review.createdBy}`}
                                     </Text>
