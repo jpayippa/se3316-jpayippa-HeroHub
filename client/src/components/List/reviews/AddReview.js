@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
-import { 
-  Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, 
-  ModalBody, ModalFooter, Button, FormControl, FormLabel, Input, 
-  Textarea, useToast, HStack, Text 
+import {
+    Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton,
+    ModalBody, ModalFooter, Button, FormControl, FormLabel, Input,
+    Textarea, useToast, HStack, Text,NumberInput,
+    NumberInputField,
+    NumberInputStepper,
+    NumberIncrementStepper,
+    NumberDecrementStepper,
 } from '@chakra-ui/react';
 
 const AddReviewModal = ({ isOpen, onClose, listId }) => {
@@ -26,10 +30,10 @@ const AddReviewModal = ({ isOpen, onClose, listId }) => {
             const token = localStorage.getItem('token');
             const response = await fetch('/api/reviews', {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
-                 },
+                },
                 body: JSON.stringify({ rating, comment, heroListId: listId }),
             });
 
@@ -69,10 +73,13 @@ const AddReviewModal = ({ isOpen, onClose, listId }) => {
                     <FormControl id="rating" isRequired isInvalid={!!ratingError}>
                         <FormLabel>Rating</FormLabel>
                         <HStack>
-                            <Input type="number" step="0.1" min="0" max="5" value={rating} onChange={(e) => {
-                                setRatingError('');
-                                setRating(e.target.value);
-                            }} />
+                            <NumberInput min={0} max= {5} precision={1} step={0.1}>
+                                <NumberInputField />
+                                <NumberInputStepper>
+                                    <NumberIncrementStepper />
+                                    <NumberDecrementStepper />
+                                </NumberInputStepper>
+                            </NumberInput>
                             <Text>/5</Text>
                         </HStack>
                         {ratingError && <Text color="red.500">{ratingError}</Text>}

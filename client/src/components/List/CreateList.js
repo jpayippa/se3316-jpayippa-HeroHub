@@ -19,11 +19,21 @@ const CreateHeroList = ({ isOpen, onClose }) => {
   };
 
   const handleAddHero = () => {
-    if (heroInput && !heroes.includes(heroInput)) {
-      setHeroes([...heroes, heroInput]);
-      setHeroInput('');
+    const heroId = parseInt(heroInput); // Ensure heroInput is treated as a number
+    if (!isNaN(heroId) && heroId >= 0 && heroId <= 733 && !heroes.includes(heroId)) {
+        setHeroes([...heroes, heroId]);
+        setHeroInput('');
+    } else {
+        // Provide feedback if the hero ID is invalid or already added
+        toast({
+            title: 'Invalid or Duplicate Hero ID',
+            description: isNaN(heroId) ? "Hero ID must be a number." : "This Hero ID is already added or out of valid range (0-733).",
+            status: 'warning',
+            duration: 5000,
+            isClosable: true,
+        });
     }
-  };
+};
 
   const handleRemoveHero = (heroToRemove) => {
     setHeroes(heroes.filter(hero => hero !== heroToRemove));

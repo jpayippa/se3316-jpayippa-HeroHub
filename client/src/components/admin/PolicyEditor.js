@@ -6,7 +6,8 @@ import {
   Heading,
   useToast,
   VStack,
-  Select
+  Select,
+    Center,
 } from '@chakra-ui/react';
 
 const PolicyEditor = () => {
@@ -74,7 +75,9 @@ const PolicyEditor = () => {
   };
 
   return (
-    <Box p={8}>
+    <Center py={6}>
+      <Box w="full" maxW="md" p={4} borderWidth="1px" borderRadius="lg" overflow="hidden" boxShadow="lg">
+    <Box p={3} >
       <Heading mb={6}>{policyExists ? 'Edit' : 'Create'} Policy</Heading>
       <VStack spacing={4}>
         <Select placeholder="Select policy" onChange={(e) => setPolicyTitle(e.target.value)}>
@@ -87,6 +90,7 @@ const PolicyEditor = () => {
           value={policyContent}
           onChange={(e) => setPolicyContent(e.target.value)}
           size="lg"
+          minW="400px"
           minH="200px" // Adjust the minimum height for comfortable editing
         />
         <Button colorScheme="blue" onClick={handleSubmit}>
@@ -94,6 +98,8 @@ const PolicyEditor = () => {
         </Button>
       </VStack>
     </Box>
+    </Box>
+    </Center>
   );
 };
 

@@ -37,9 +37,10 @@ const EditModal = ({ isOpen, onClose, list, onSave }) => {
             setName(list.name || '');
             setDescription(list.description || '');
             setVisibility(list.visibility || '');
-            setHeroes(list.heroes || []);
+            setHeroes(list.heroes.map(heroId => parseInt(heroId)) || []);
         }
     }, [list]);
+    
 
     if (!list) {
         return null; // or some other placeholder content
@@ -48,11 +49,22 @@ const EditModal = ({ isOpen, onClose, list, onSave }) => {
     const handleHeroInputChange = (e) => setHeroInput(e.target.value);
 
     const handleAddHero = () => {
-        if (heroInput && !heroes.includes(heroInput)) {
-            setHeroes([...heroes, heroInput]);
+        const heroId = parseInt(heroInput); // Ensure heroInput is treated as a number
+        if (!isNaN(heroId) && heroId >= 0 && heroId <= 733 && !heroes.includes(heroId)) {
+            setHeroes([...heroes, heroId]);
             setHeroInput('');
+        } else {
+            // Provide feedback if the hero ID is invalid or already added
+            toast({
+                title: 'Invalid or Duplicate Hero ID',
+                description: isNaN(heroId) ? "Hero ID must be a number." : "This Hero ID is already added or out of valid range (0-733).",
+                status: 'warning',
+                duration: 5000,
+                isClosable: true,
+            });
         }
     };
+    
 
     const handleRemoveHero = (heroId) => {
         setHeroes(heroes.filter(hero => hero !== heroId));
@@ -60,6 +72,28 @@ const EditModal = ({ isOpen, onClose, list, onSave }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!name.trim() || !visibility.trim() || (heroes.length === 0)) {
+            toast({
+                title: 'Missing information',
+                description: "Please fill in all required fields.",
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
+            return;
+        }
+
+        // Validate hero IDs
+        if (heroes.some(heroId => isNaN(heroId) || heroId < 0 || heroId > 733)) {
+            toast({
+                title: 'Invalid Hero ID',
+                description: "Hero IDs must be between 0 and 733.",
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
+            return;
+        }
         try {
             const token = localStorage.getItem('token'); // Replace with actual token retrieval logic
             const response = await fetch(`/api/hero-lists/${list._id}`, {

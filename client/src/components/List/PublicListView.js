@@ -106,6 +106,7 @@ const PublicListView = ({ maxDisplay, authenticated = false, admin = false }) =>
                                 </Text>
                                 <Collapse in={expandedListId === list._id} animateOpacity>
                                     <Text mt={4}>{list.description}</Text>
+                                    <Text mt={4}>Numeber of Heros: {list.heroes.length}</Text>
                                     <Text mt={4}>Create on: {formatDate(list.createdAt)}</Text>
                                     <Text mt={4}>Last updated: {formatDate(list.updatedAt)}</Text>
                                     {authenticated && (
