@@ -5,18 +5,29 @@ import { ADMINVIEW, DASHBOARD, REGISTER } from '../../router/Approuter';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase/firebase-config';
 import ForgotPasswordModal from './ForgotPassword';
+import { sendEmailVerification } from 'firebase/auth';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [localError, setLocalError] = useState('');
     const { isLoading, error: firebaseError, login } = useLogin();
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
+    const [resendEmailRequested, setResendEmailRequested] = useState(false);
+
 
     const openForgotPasswordModal = () => setIsForgotPasswordModalOpen(true);
     const closeForgotPasswordModal = () => setIsForgotPasswordModalOpen(false);
+
+    const resendVerificationEmail = async () => {
+        const user = auth.currentUser;
+        if (user) {
+            await sendEmailVerification(user);
+            setResendEmailRequested(true);
+        }
+    };
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -38,6 +49,7 @@ const Login = () => {
             });
 
             const data = await response.json();
+            console.log(data.token);
 
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
@@ -84,24 +96,25 @@ const Login = () => {
                     localStorage.setItem('user', JSON.stringify(data.user));
                     localStorage.setItem('role', data.user.role);
                     localStorage.setItem('email', data.user.email);
-                    
+
 
                     if (data.user.role === 'admin' || data.user.role === 'GrandAdmin') {
-                        
+
                         navigate(ADMINVIEW);
-                    }else if (data.user.role === 'user') {
+                    } else if (data.user.role === 'user') {
                         navigate(DASHBOARD);
                     }
                 } else {
-                    alert('Please verify your email before logging in.');
-                    navigate('/'); // or any other route you prefer
+                    alert('Please verify your email before logging in. Click OK to resend verification email.');
+                    await resendVerificationEmail();
+                    navigate('/'); // Redirect or show message
                     return;
                 }
             } else {
                 if (data.user.role === 'admin' || data.user.role === 'GrandAdmin') {
-                        
+
                     navigate(ADMINVIEW);
-                }else if (data.user.role === 'user') {
+                } else {
                     navigate(DASHBOARD);
                 }
             }
@@ -143,14 +156,14 @@ const Login = () => {
                         Login
                     </Button>
                 </VStack>
-                
+
                 <Text mt={2} textAlign="center">
-                Forgot your password? 
-                <Link color="blue.500" onClick={openForgotPasswordModal}>
-                    Reset it here
-                </Link>.
-            </Text>
-            <ForgotPasswordModal isOpen={isForgotPasswordModalOpen} onClose={closeForgotPasswordModal} />
+                    Forgot your password?
+                    <Link color="blue.500" onClick={openForgotPasswordModal}>
+                        Reset it here
+                    </Link>.
+                </Text>
+                <ForgotPasswordModal isOpen={isForgotPasswordModalOpen} onClose={closeForgotPasswordModal} />
 
                 <Text mt={4} textAlign="center">
                     Don't have an account?{' '}

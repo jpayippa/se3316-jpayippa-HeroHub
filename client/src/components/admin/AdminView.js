@@ -1,9 +1,11 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Center, Box, Text } from "@chakra-ui/react";
 import SearchHero from "../searchHeros";
 import PublicListView from "../List/PublicListView";
 import UserListsView from "../List/UserListsView";
 import UserSListView from "./ListUsers";
+import { useNavigate } from "react-router-dom";
+import { DASHBOARD } from "../../router/Approuter";
 
 
 export default function AdminView() {
@@ -11,6 +13,11 @@ export default function AdminView() {
   const user = userString ? JSON.parse(userString) : null;  
   // Now you can access user.nickname
   const nickname = user ? user.nickname : 'Guest';
+
+  const navigate = useNavigate();
+
+
+
 
   return (
     <>

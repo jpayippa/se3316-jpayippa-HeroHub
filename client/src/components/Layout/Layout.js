@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import NavBar from '../NavBar/Navbar';
-import { ADMINVIEW, LOGIN } from '../../router/Approuter';
+import { ADMINVIEW, DASHBOARD, LOGIN } from '../../router/Approuter';
 
 export default function Layout() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -17,15 +16,15 @@ export default function Layout() {
 
             try {
                 const response = await fetch('/api/verify-token', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if (response.ok) {
-                    setIsAuthenticated(true);
-                    if(localStorage.getItem('role') === 'admin') {
+                    const data = await response.json(); // Assuming the server sends back user data including role
+                    if (data.role === 'admin' || data.role === 'GrandAdmin') {
                         navigate(ADMINVIEW);
+                    } else {
+                        navigate(DASHBOARD);
                     }
                 } else {
                     navigate(LOGIN);
@@ -41,8 +40,8 @@ export default function Layout() {
 
     return (
         <>
-            <NavBar loggedin={isAuthenticated} />
-            {isAuthenticated ? <Outlet /> : null}
+            <NavBar loggedin={true} /> {/* isAuthenticated is not required if handled by verifyToken */}
+            <Outlet />
         </>
     );
 }

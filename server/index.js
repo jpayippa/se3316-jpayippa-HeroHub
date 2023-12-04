@@ -17,7 +17,7 @@ const Review = require('./models/review.model');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const authenticateToken = require('./utils/verifyJWT');
-const authenticateAndAuthorizeAdmin = require('./utils/verifyJWT');
+const authenticateAndAuthorizeAdmin = require('./utils/verifyAdmin');
 
 require('dotenv').config();
 
@@ -128,8 +128,13 @@ app.post('/api/login', async (req, res) => {
 
 // Endpoint to verify token
 app.get('/api/verify-token', authenticateToken, (req, res) => {
-  res.json({ message: 'Token is valid', user: req.user });
+  // Assuming req.user is populated by the middleware
+  res.json({
+    message: 'Token is valid',
+    role: req.user.role // Send back the user's role
+  });
 });
+
 
 
 
@@ -309,28 +314,24 @@ app.post('/api/hero-lists', authenticateToken, async (req, res) => {
 
 
 app.get('/api/hero-lists', async (req, res) => {
-  
     try {
-        const { visibility, limit } = req.query;
+        const { visibility } = req.query;
+        const query = {};
 
-        // Build the query object
-        let query = {};
         if (visibility) {
             query.visibility = visibility;
         }
 
-        // Fetch hero lists with optional limit
-        let heroLists = await HeroList.find(query);
-
-        if (limit) {
-            heroLists = heroLists.slice(0, parseInt(limit));
-        }
+        const heroLists = await HeroList.find(query)
+            .sort({ updatedAt: -1 }) // Sort by updatedAt in descending order
+            .exec();
 
         res.json(heroLists);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching hero lists' });
+        res.status(500).send('Server error');
     }
 });
+
 
 
 // Endpoint to get user-specific hero lists
