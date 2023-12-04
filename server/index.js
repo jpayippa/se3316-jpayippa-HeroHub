@@ -18,6 +18,8 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const authenticateToken = require('./utils/verifyJWT');
 const authenticateAndAuthorizeAdmin = require('./utils/verifyAdmin');
+const Policy = require('./models/policy.model');
+const DMCA_Log = require('./models/dcmaLog.model');
 
 require('dotenv').config();
 
@@ -83,13 +85,12 @@ app.post('/api/register', async (req, res) => {
     
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
-    console.log(error.message);
+    
     res.status(500).json({ error: 'Error registering user' });
   }
 });
 
 app.post('/api/users/update-verification', async (req, res) => {
-  console.log(req.body);
   const { firebaseId } = req.body;
 
   try {
@@ -102,7 +103,6 @@ app.post('/api/users/update-verification', async (req, res) => {
 
 
 app.post('/api/login', async (req, res) => {
-  console.log(req.body);
   
   try {
     const { email } = req.body;
@@ -202,7 +202,6 @@ app.put('/api/users/:userId/disable', authenticateAndAuthorizeAdmin, async (req,
       { isDisabled: isDisabled },
       { new: true } // Return the updated document
     );
-    console.log(updatedUser);
 
     if (!updatedUser) {
       return res.status(404).json({ error: 'User not found' });
@@ -336,7 +335,6 @@ app.get('/api/hero-lists', async (req, res) => {
 
 // Endpoint to get user-specific hero lists
 app.get('/api/user-hero-lists', authenticateToken, async (req, res) => {
-  console.log(req.user);
   try {
     // Extract nickname from JWT
     const nickname = req.user.nickname;
@@ -384,13 +382,11 @@ app.post('/api/user-hero-lists/check-name', authenticateToken, async (req, res) 
     const userNickname = req.user.nickname;
     const { name } = req.body;
 
-    console.log('Checking list name:', name, 'for user:', userNickname);
 
     const existingList = await HeroList.findOne({ name: name, 'createdBy.name': userNickname });
-    console.log('Found existing list:', existingList);
 
     const exists = !!existingList;
-    console.log('Exists:', exists);
+    
 
     res.json({ exists: exists });
   } catch (error) {
@@ -501,6 +497,108 @@ app.delete('/api/reviews/:id', authenticateToken, async (req, res) => {
       res.status(500).json({ error: 'Error deleting review' });
   }
 });
+
+// =========================Privacy and DCMA endpoints ========================= //
+
+const authenticateAndAuthorizeGrandAdmin = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+      if (err) {
+          return res.status(403).json({ error: 'Invalid or expired token' });
+      }
+
+      // Check if the user role is admin or GrandAdmin
+      if (user.role !== 'GrandAdmin') {
+          return res.status(403).json({ error: 'Unauthorized access' });
+      }
+
+      req.user = user; // Add user information to the request
+      next();
+  });
+};
+
+//creating and updating policy
+app.post('/api/policies', authenticateAndAuthorizeGrandAdmin, async (req, res) => {
+  const { title, content } = req.body;
+  console.log('Creating policy:', title);
+  console.log('Content:', content);
+
+  try {
+    const existingPolicy = await Policy.findOne({ title });
+
+    if (existingPolicy) {
+      existingPolicy.content = content;
+      existingPolicy.updated_at = new Date();
+      await existingPolicy.save();
+    } else {
+      const newPolicy = new Policy({ title, content });
+      await newPolicy.save();
+    }
+
+    res.status(200).json({ message: 'Policy updated successfully' });
+  } catch (error) {
+    console.error('Error updating policy:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//retirive policy
+app.get('/api/policies/:title', async (req, res) => {
+  console.log('Fetching policy:', req.params.title);
+  try {
+    const policy = await Policy.findOne({ title: req.params.title });
+
+    if (!policy) {
+      return res.status(404).json({ error: 'Policy not found' });
+    }
+
+    res.json(policy);
+  } catch (error) {
+    console.error('Error fetching policy:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Log DMCA activities
+app.post('/api/dmca-logs', authenticateAndAuthorizeGrandAdmin, async (req, res) => {
+  const { type, review_id, details } = req.body;
+
+  try {
+    const newLog = new DMCA_Log({ type, review_id, details });
+    await newLog.save();
+
+    res.status(200).json({ message: 'DMCA activity logged successfully' });
+  } catch (error) {
+    console.error('Error logging DMCA activity:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//update review status to DMCA
+app.put('/api/reviews/:id/dmca-status', authenticateAndAuthorizeGrandAdmin, async (req, res) => {
+  const { dmca_status } = req.body;
+
+  try {
+    const review = await Review.findByIdAndUpdate(req.params.id, { dmca_status }, { new: true });
+    if (!review) {
+      return res.status(404).json({ error: 'Review not found' });
+    }
+
+    res.json(review);
+  } catch (error) {
+    console.error('Error updating review DMCA status:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+
 
 
 

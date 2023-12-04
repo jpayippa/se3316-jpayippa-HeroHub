@@ -16,7 +16,6 @@ const authenticateAndAuthorizeAdmin = (req, res, next) => {
         }
   
         // Check if the user role is admin or GrandAdmin
-        console.log(user.role);
         if (user.role !== 'admin' && user.role !== 'GrandAdmin') {
             return res.status(403).json({ error: 'Unauthorized access' });
         }
