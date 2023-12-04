@@ -10,14 +10,28 @@ import {
 } from '@chakra-ui/react';
 
 const PolicyModal = ({ isOpen, onClose, policyTitle = 'Acceptable Use Policy' }) => {
-    console.log("PolicyModal.js: policyTitle: ", policyTitle);
   const [policyContent, setPolicyContent] = useState('');
+  const [lastUpdate, setLastUpdate] = useState('');
+
+  const formatDate = (dateString) => {
+    try {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return new Intl.DateTimeFormat('en-US', options).format(new Date(dateString));
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return ''; // or a default message like "Not available"
+    }
+  };
 
   useEffect(() => {
-    // Fetch policy content based on the policyTitle
     fetch(`/api/policies/${policyTitle}`)
       .then((res) => res.json())
-      .then((data) => setPolicyContent(data.content))
+      .then((data) => {
+        setPolicyContent(data.content);
+        if (data.updated_at) {
+          setLastUpdate(formatDate(data.updated_at));
+        }
+      })
       .catch((error) => console.error('Error fetching policy:', error));
   }, [policyTitle]);
 
@@ -28,6 +42,7 @@ const PolicyModal = ({ isOpen, onClose, policyTitle = 'Acceptable Use Policy' })
         <ModalHeader>{policyTitle}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
+          {lastUpdate && <Text fontWeight="bold">Last Updated: {lastUpdate}</Text>}
           <Text whiteSpace="pre-wrap">{policyContent}</Text>
         </ModalBody>
       </ModalContent>

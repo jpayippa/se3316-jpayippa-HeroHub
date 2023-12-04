@@ -15,15 +15,35 @@ const PublicListView = ({ maxDisplay, authenticated = false, admin = false }) =>
     const [isAddReviewModalOpen, setIsAddReviewModalOpen] = useState(false);
     const [selectedListId, setSelectedListId] = useState(null);
 
-
+    const fetchAverageRating = async (listId) => {
+        try {
+            const response = await fetch(`/api/hero-lists/${listId}/average-rating`);
+            if (response.ok) {
+                const data = await response.json();
+                return data.averageRating;
+            }
+            return 'Not Rated';
+        } catch (error) {
+            console.error('Error fetching average rating:', error);
+            return 'Not Rated';
+        }
+    };
 
     useEffect(() => {
         const fetchHeroLists = async () => {
+            setLoading(true);
             try {
                 const response = await fetch('/api/hero-lists?visibility=public');
                 if (!response.ok) throw new Error('Failed to fetch');
                 const data = await response.json();
-                setHeroLists(data.slice(0, maxDisplay)); // Limiting the number of lists
+
+                // Fetch and add average ratings to each list
+                const listsWithRatings = await Promise.all(data.map(async (list) => {
+                    const averageRating = await fetchAverageRating(list._id);
+                    return { ...list, averageRating };
+                }));
+
+                setHeroLists(listsWithRatings.slice(0, maxDisplay));
             } catch (error) {
                 console.error(error);
             } finally {
@@ -107,6 +127,7 @@ const PublicListView = ({ maxDisplay, authenticated = false, admin = false }) =>
                                 <Collapse in={expandedListId === list._id} animateOpacity>
                                     <Text mt={4}>{list.description}</Text>
                                     <Text mt={4}>Numeber of Heros: {list.heroes.length}</Text>
+                                    <Text mt={2}>Average Rating: {list.averageRating}</Text>
                                     <Text mt={4}>Create on: {formatDate(list.createdAt)}</Text>
                                     <Text mt={4}>Last updated: {formatDate(list.updatedAt)}</Text>
                                     {authenticated && (

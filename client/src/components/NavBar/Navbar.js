@@ -16,7 +16,7 @@ const NavBar = ({ loggedin = false }) => {
 
     return (
         <nav className="top-nav-bar">
-            <div className="app-name">Hero Hub</div>
+            <div className="app-name">HeroSphere</div>
             <div className="dropdown">
                 {loggedin ? (
                     // Call the logout function when the logout link is clicked

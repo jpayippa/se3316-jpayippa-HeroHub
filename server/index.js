@@ -488,6 +488,30 @@ app.put('/api/reviews/:id/visibility', authenticateToken, async (req, res) => {
   }
 });
 
+// Endpoint to get the average rating for a hero list
+app.get('/api/hero-lists/:id/average-rating', async (req, res) => {
+  try {
+    const listId = req.params.id;
+    
+    // Find all reviews for the specified hero list
+    const reviews = await Review.find({ heroListId: listId });
+    
+    // Calculate the average rating
+    if (reviews.length === 0) {
+      return res.status(404).json({ error: 'No reviews found for this hero list' });
+    }
+
+    const averageRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
+
+    // Send the average rating
+    res.json({ averageRating: averageRating.toFixed(2) }); // Rounds to two decimal places
+  } catch (error) {
+    console.error('Error fetching average rating:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 // DELETE endpoint to delete a review
 app.delete('/api/reviews/:id', authenticateToken, async (req, res) => {
   try {
