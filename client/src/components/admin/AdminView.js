@@ -19,6 +19,7 @@ export default function AdminView() {
             <Text fontSize="xl" fontWeight="bold" mb={2}>Welcome Admin {nickname}</Text>
           </Box>
         </Center>
+        <UserSListView />
         <SearchHero />
         <UserListsView />
         <PublicListView maxDisplay={5} authenticated ={true} admin={true}/>

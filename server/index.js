@@ -156,9 +156,37 @@ app.get('/api/users', authenticateAndAuthorizeAdmin, async (req, res) => {
   }
 });
 
+// PUT endpoint to update user's role
+app.put('/api/users/:userId/role', authenticateAndAuthorizeAdmin, async (req, res) => {
+  const { userId } = req.params;
+  const { newRole } = req.body;
+
+  // Check if the new role is valid
+  if (!['admin', 'user'].includes(newRole)) {
+      return res.status(400).json({ error: 'Invalid role' });
+  }
+
+  try {
+      const updatedUser = await User.findByIdAndUpdate(
+          userId,
+          { role: newRole },
+          { new: true, runValidators: true } // Return the updated document and run schema validators
+      );
+
+      if (!updatedUser) {
+          return res.status(404).json({ error: 'User not found' });
+      }
+
+      res.json({ message: 'User role updated successfully', updatedUser });
+  } catch (error) {
+      console.error('Error updating user role:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 // PUT endpoint to update user's disabled status
-app.put('/users/:userId/disable', authenticateAndAuthorizeAdmin, async (req, res) => {
+app.put('/api/users/:userId/disable', authenticateAndAuthorizeAdmin, async (req, res) => {
   const { userId } = req.params;
   const { isDisabled } = req.body;
 
@@ -169,6 +197,7 @@ app.put('/users/:userId/disable', authenticateAndAuthorizeAdmin, async (req, res
       { isDisabled: isDisabled },
       { new: true } // Return the updated document
     );
+    console.log(updatedUser);
 
     if (!updatedUser) {
       return res.status(404).json({ error: 'User not found' });

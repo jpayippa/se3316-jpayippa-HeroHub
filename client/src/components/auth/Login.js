@@ -86,7 +86,7 @@ const Login = () => {
                     localStorage.setItem('email', data.user.email);
                     
 
-                    if (data.user.role === 'admin' || data.user.email === 'joelps2002@gmail.com') {
+                    if (data.user.role === 'admin' || data.user.role === 'GrandAdmin') {
                         
                         navigate(ADMINVIEW);
                     }else if (data.user.role === 'user') {
@@ -98,7 +98,12 @@ const Login = () => {
                     return;
                 }
             } else {
-                navigate(DASHBOARD);
+                if (data.user.role === 'admin' || data.user.role === 'GrandAdmin') {
+                        
+                    navigate(ADMINVIEW);
+                }else if (data.user.role === 'user') {
+                    navigate(DASHBOARD);
+                }
             }
 
 
