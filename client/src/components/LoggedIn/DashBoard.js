@@ -1,7 +1,6 @@
 import React from "react";
 import { Center, Box, Text } from "@chakra-ui/react";
 import SearchHero from "../searchHeros";
-import CreateHeroList from "../List/CreateList";
 import PublicListView from "../List/PublicListView";
 import UserListsView from "../List/UserListsView";
 

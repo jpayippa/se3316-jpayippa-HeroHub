@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { auth } from '../firebase/firebase-config'; 
 import { useSignOut } from 'react-firebase-hooks/auth';
 import { useToast } from '@chakra-ui/react';
@@ -45,7 +45,7 @@ export const useCreateAccount = () => {
         }
     };
 
-    return { error, createAccount };
+    return { error, createAccount, isLoading };
 };
 
 const createUserInDatabase = async (userData) => {
@@ -58,7 +58,6 @@ const createUserInDatabase = async (userData) => {
             body: JSON.stringify(userData)
         });
 
-        const data = await response.json();
 
         if (response.ok) {
             console.log('User registered successfully');

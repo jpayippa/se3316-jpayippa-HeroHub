@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Box, Collapse, Button, VStack, Text, Flex, Switch, useToast, Center, Heading, IconButton, Tooltip
+    Box, Collapse, VStack, Text, Flex, Switch, useToast, Center, Heading, IconButton, Tooltip
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { EditIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons';

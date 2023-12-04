@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, VStack, Text, Spinner, Center, Collapse, Heading, IconButton, Flex, useToast, Button, Modal } from '@chakra-ui/react';
+import { Box, VStack, Text, Spinner, Center, Collapse, Heading, IconButton, Flex, useToast, Button } from '@chakra-ui/react';
 import SearchResult from '../SearchResults';
 import { AiFillDelete, AiFillEdit } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom';

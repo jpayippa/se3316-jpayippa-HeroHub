@@ -1,11 +1,10 @@
 import React from "react";
-import { Center, Box, Text, Heading, VStack } from "@chakra-ui/react";
+import { Center, Box, Text,  VStack } from "@chakra-ui/react";
 import SearchHero from "../searchHeros";
 import PublicListView from "../List/PublicListView";
 import UserListsView from "../List/UserListsView";
 import UserSListView from "./ListUsers";
 import PolicyEditor from "./PolicyEditor";
-import DMCALogger from "./DCMALogger";
 
 export default function AdminView() {
   const role = localStorage.getItem("role");

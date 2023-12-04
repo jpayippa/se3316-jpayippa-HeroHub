@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Box, Button, FormControl, FormLabel, Input, Textarea, Stack, useToast, Select, Tag, TagLabel, Heading, TagCloseButton, HStack, Center,
+  Box, Button, FormControl, FormLabel, Input, Textarea, Stack, useToast, Select, Tag, TagLabel, Heading, TagCloseButton, HStack,
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';

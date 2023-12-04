@@ -20,8 +20,12 @@ const authenticateToken = require('./utils/verifyJWT');
 const authenticateAndAuthorizeAdmin = require('./utils/verifyAdmin');
 const Policy = require('./models/policy.model');
 const DMCA_Log = require('./models/dcmaLog.model');
-
 require('dotenv').config();
+const path = require('path');
+
+
+
+
 
 
 const express = require("express");
@@ -42,6 +46,29 @@ const app = express();
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+
+
+
+
+
+// const _dirname = path.dirname(__filename); // Get the directory of the current script
+// const buildPath = path.join(_dirname, "../client/build");
+
+// app.use(express.static(buildPath));
+
+// app.use("/*", function(req, res) {
+//   res.sendFile(path.join(buildPath, "index.html"), function(err) {
+//     if (err) {
+//       res.status(500).send(err);
+//     }
+//   });
+// });
+
+
+
 
 app.use((req, res, next) => {
   console.log('Middleware hit:', req.method, req.url);
@@ -142,24 +169,34 @@ app.get('/api/verify-token', authenticateToken, (req, res) => {
 
 app.get('/api/users', authenticateAndAuthorizeAdmin, async (req, res) => {
   try {
-      const users = await User.find({ role: { $ne: 'GrandAdmin' } }); // Exclude GrandAdmin
-      res.json(users.map(user => {
-          return {
-              id: user._id,
-              firebaseId: user.firebaseId,
-              email: user.email,
-              nickname: user.nickname,
-              role: user.role,
-              isDisabled: user.isDisabled,
-              emailVerified: user.emailVerified,
-           
-          };
+      // Get the role of the authenticated user
+      const userRole = req.user.role;
+
+      // Build the query based on the role
+      let query = { role: { $ne: 'GrandAdmin' } }; // Default query excludes GrandAdmins
+      if (userRole === 'admin') {
+          query = { role: 'user' }; // If the user is an admin, only fetch users with 'user' role
+      }
+
+      // Execute the query
+      const users = await User.find(query);
+      const filteredUsers = users.map(user => ({
+          id: user._id,
+          firebaseId: user.firebaseId,
+          email: user.email,
+          nickname: user.nickname,
+          role: user.role,
+          isDisabled: user.isDisabled,
+          emailVerified: user.emailVerified,
       }));
+
+      res.json(filteredUsers);
   } catch (error) {
       console.error('Error fetching users:', error);
       res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 // PUT endpoint to update user's role
 app.put('/api/users/:userId/role', authenticateAndAuthorizeAdmin, async (req, res) => {
@@ -287,6 +324,7 @@ app.post('/api/hero-lists', authenticateToken, async (req, res) => {
   try {
       const { name, description, heroes, visibility } = req.body;
 
+      console.log(req.body);
       const sanitizedName = sanitizeInput(name);
       const sanitizedDescription = sanitizeInput(description);
       const sanitizedHeroes = heroes.map(hero => sanitizeInput(hero));
@@ -307,6 +345,7 @@ app.post('/api/hero-lists', authenticateToken, async (req, res) => {
       await newHeroList.save();
       res.status(201).json(newHeroList);
   } catch (error) {
+    console.log(error.message);
       res.status(500).json({ error: 'Error creating hero list' });
   }
 });
@@ -338,6 +377,7 @@ app.get('/api/user-hero-lists', authenticateToken, async (req, res) => {
   try {
     // Extract nickname from JWT
     const nickname = req.user.nickname;
+
 
     // Find all hero lists created by the user
     const heroLists = await HeroList.find({ 'createdBy.name': nickname });
@@ -624,7 +664,9 @@ app.put('/api/reviews/:id/dmca-status', authenticateAndAuthorizeGrandAdmin, asyn
 
 
 
-
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+});
 
 
 // --------------------------End of Endpoints-----------------------------------//

@@ -15,7 +15,6 @@ const Login = () => {
     const navigate = useNavigate();
 
     const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
-    const [resendEmailRequested, setResendEmailRequested] = useState(false);
 
 
     const openForgotPasswordModal = () => setIsForgotPasswordModalOpen(true);
@@ -25,7 +24,6 @@ const Login = () => {
         const user = auth.currentUser;
         if (user) {
             await sendEmailVerification(user);
-            setResendEmailRequested(true);
         }
     };
 
