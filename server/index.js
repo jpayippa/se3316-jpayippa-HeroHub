@@ -17,6 +17,7 @@ const Review = require('./models/review.model');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const authenticateToken = require('./utils/verifyJWT');
+const authenticateAndAuthorizeAdmin = require('./utils/verifyJWT');
 
 require('dotenv').config();
 
@@ -49,6 +50,7 @@ app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} request for ${req.url}`);
   next();
 });
+
 
 // ====================Authentication Endpoints ==================== //
 app.get('/', (req, res) => {
@@ -113,7 +115,7 @@ app.post('/api/login', async (req, res) => {
 
     // Generate a JWT token
     const token = jwt.sign(
-      { userId: user._id, email: user.email, nickname: user.nickname, firebaseId: user.firebaseId},
+      { userId: user._id, email: user.email, nickname: user.nickname, firebaseId: user.firebaseId, role: user.role},
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -127,6 +129,55 @@ app.post('/api/login', async (req, res) => {
 // Endpoint to verify token
 app.get('/api/verify-token', authenticateToken, (req, res) => {
   res.json({ message: 'Token is valid', user: req.user });
+});
+
+
+
+//=====================Admin Endpoints======================//
+
+app.get('/api/users', authenticateAndAuthorizeAdmin, async (req, res) => {
+  try {
+      const users = await User.find({ role: { $ne: 'GrandAdmin' } }); // Exclude GrandAdmin
+      res.json(users.map(user => {
+          return {
+              id: user._id,
+              firebaseId: user.firebaseId,
+              email: user.email,
+              nickname: user.nickname,
+              role: user.role,
+              isDisabled: user.isDisabled,
+              emailVerified: user.emailVerified,
+           
+          };
+      }));
+  } catch (error) {
+      console.error('Error fetching users:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+// PUT endpoint to update user's disabled status
+app.put('/users/:userId/disable', authenticateAndAuthorizeAdmin, async (req, res) => {
+  const { userId } = req.params;
+  const { isDisabled } = req.body;
+
+  try {
+    // Find the user by ID and update the isDisabled status
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { isDisabled: isDisabled },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ message: 'User updated successfully', updatedUser });
+  } catch (error) {
+    res.status(500).json({ error: 'Error updating user' });
+  }
 });
 
 
@@ -320,12 +371,15 @@ app.delete('/api/hero-lists/:id',authenticateToken, async (req, res) => {
 app.post('/api/reviews', authenticateToken, async (req, res) => {
   try {
       const { rating, comment, heroListId } = req.body;
+      const sanitizedRating = sanitizeInput(rating);
+      const sanitizedComment = sanitizeInput(comment);
+      const sanitizedHeroListId = sanitizeInput(heroListId);
       const createdBy = req.user.nickname; // Extract nickname from authenticated user
 
       const newReview = new Review({
-          rating,
-          comment,
-          heroListId,
+          rating : sanitizedRating,
+          comment : sanitizedComment,
+          heroListId: sanitizedHeroListId,
           createdBy
       });
 

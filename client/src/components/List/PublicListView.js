@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, VStack, Text, Spinner, Center, Collapse, Heading, Button } from '@chakra-ui/react';
 import SearchResult from '../SearchResults';
 import ReviewModal from './reviews/ViewReviews';
-import AddReviewModal from './reviews/AddReviews';
+import AddReviewModal from './reviews/AddReview';
 import { AiOutlineEye, AiOutlinePlus } from 'react-icons/ai';
 
 
