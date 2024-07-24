@@ -2,6 +2,9 @@
 
 A web application developed for SE 3316A Web Technologies Lab #4, leveraging React for the front-end and Node.js with Express for the back-end, hosted on AWS.
 
+Hero Hub is an enhanced web application that allows users to create, manage, and share lists of heroes. Authenticated users can create and edit their hero lists, add comments and ratings, while admins can manage user accounts and handle copyright-related tasks.
+
+
 ## Table of Contents
 - [Project Overview](#project-overview)
 - [Objectives](#objectives)
