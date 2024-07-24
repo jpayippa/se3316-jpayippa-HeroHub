@@ -1,70 +1,135 @@
-# Getting Started with Create React App
+# Hero Hub
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A web application developed for SE 3316A Web Technologies Lab #4, leveraging React for the front-end and Node.js with Express for the back-end, hosted on AWS.
 
-## Available Scripts
+## Table of Contents
+- [Project Overview](#project-overview)
+- [Objectives](#objectives)
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Getting Started](#getting-started)
+- [API Endpoints](#api-endpoints)
+- [Authentication](#authentication)
+- [Security & Privacy](#security--privacy)
+- [DMCA Policy](#dmca-policy)
+- [Submission Instructions](#submission-instructions)
+- [Contributing](#contributing)
+- [License](#license)
 
-In the project directory, you can run:
+## Project Overview
+Hero Hub is an enhanced web application that allows users to create, manage, and share lists of heroes. Authenticated users can create and edit their hero lists, add comments and ratings, while admins can manage user accounts and handle copyright-related tasks.
 
-### `npm start`
+## Objectives
+1. Apply knowledge of server-side and client-side scripting to create a complex web application.
+2. Expose major functionality via a RESTful web API.
+3. Develop a client application using React.
+4. Implement an authentication protocol and provide different levels of functionality to authenticated vs. unauthenticated users.
+5. Create a responsive user interface.
+6. Ensure the application is resistant to malicious exploitation.
+7. Develop security, privacy, and DMCA policies that are publicly accessible.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Features
+- **Authentication:**
+  - Local authentication with email, password, and nickname.
+  - Email verification and input validation.
+  - Account management (update password, disable account).
+- **Unauthenticated Users:**
+  - View the start page with application info and login mechanism.
+  - Search for heroes by name, race, power, or publisher.
+  - View public hero lists and detailed hero information.
+- **Authenticated Users:**
+  - Create, edit, and delete hero lists.
+  - Add comments and ratings to public hero lists.
+- **Admin Functionality:**
+  - Manage user accounts (grant manager privileges, disable accounts).
+  - Handle DMCA requests and log entries.
+  - Manage reviews (hide or restore reviews).
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Technologies Used
+- **Front-End:** React, CSS, HTML
+- **Back-End:** Node.js, Express
+- **Database:** MongoDB
+- **Authentication:** JWT, bcrypt
+- **Hosting:** AWS
 
-### `npm test`
+## Getting Started
+### Prerequisites
+- Node.js
+- npm
+- MongoDB
+- AWS account
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/se3316-xxx-lab4.git
+   cd se3316-xxx-lab4
+   ```
 
-### `npm run build`
+2. Install dependencies for the back-end:
+   ```bash
+   cd server
+   npm install
+   ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+3. Install dependencies for the front-end:
+   ```bash
+   cd ../client
+   npm install
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Running the Application
+1. Start the back-end server:
+   ```bash
+   cd server
+   npm start
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+2. Start the front-end server:
+   ```bash
+   cd ../client
+   npm start
+   ```
 
-### `npm run eject`
+3. Access the application at `http://localhost:3000`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## API Endpoints
+### Public Endpoints
+- `GET /api/open/heroes` - Search for heroes.
+- `GET /api/open/lists` - View public hero lists.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Secure Endpoints (Authenticated Users)
+- `POST /api/secure/lists` - Create a new hero list.
+- `PUT /api/secure/lists/:id` - Edit an existing hero list.
+- `DELETE /api/secure/lists/:id` - Delete a hero list.
+- `POST /api/secure/reviews` - Add a review to a hero list.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Admin Endpoints
+- `POST /api/admin/disable-user` - Disable a user account.
+- `POST /api/admin/manage-reviews` - Manage reviews (hide/restore).
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Authentication
+Authentication is handled using JWT. Users can create accounts, log in, and receive a token that must be included in the header of secure API requests.
 
-## Learn More
+## Security & Privacy
+- **Security Policy:** [Link to security policy]
+- **Privacy Policy:** [Link to privacy policy]
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## DMCA Policy
+- **DMCA Notice:** [Link to DMCA notice]
+- **DMCA Takedown Procedure:** [Link to takedown procedure]
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Submission Instructions
+1. Ensure your repository is named `se3316-xxx-lab4`.
+2. Use a proper `.gitignore` file.
+3. Submit the output of `git log` on Owl.
+4. Download and submit your repository as a zip file on Owl.
+5. Submit a completed test plan on Owl.
+6. Demonstrate your application on a public URL before the demonstration deadline.
 
-### Code Splitting
+## Contributing
+Contributions are welcome! Please fork the repository and submit a pull request for review.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
